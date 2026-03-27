@@ -1,4 +1,5 @@
-import "../../styles/Ui.css"
+import "../../Styles/Ui.css"
+
 function Loading() {
     return (
             <div className="page-loader">
