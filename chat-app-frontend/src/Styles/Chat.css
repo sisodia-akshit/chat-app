@@ -1,0 +1,126 @@
+.chat {
+  position: relative;
+  width: 100%;
+  min-width: 300px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+
+.chat-top {
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #ddd;
+  background-color: #fff;
+  z-index: 1;
+}
+
+.chat-top-left {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-left: 0.5rem;
+  box-sizing: border-box;
+}
+.chat-top-img {
+  min-width: 35px;
+  height: 35px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.chat-top-name {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  text-transform: capitalize;
+}
+.chat-top-email {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.chat-main {
+  overflow-y: scroll;
+  /* height: 100%; */
+  width: 100%;
+  /* height: calc(100% - 78px); */
+  height: fit-content;
+  box-sizing: border-box;
+  padding: 70px 0 0 0;
+  padding-bottom: 10px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  align-items: center;
+  background-color: #fff;
+}
+.chat-main::-webkit-scrollbar {
+  display: none;
+}
+
+.chat-content-form {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  gap: 0.5rem;
+  background-color: #fff;
+
+  & input::placeholder {
+    color: #999;
+  }
+}
+
+.chat-content-inputs {
+  display: flex;
+  width: 100%;
+}
+
+.chat-content-files-button {
+  min-height: 40px;
+  min-width: 40px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+.chat-content-audio-button {
+  min-height: 40px;
+  min-width: 40px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+.chat-content-input {
+  width: 100%;
+  border: none;
+  background-color: #eee;
+  height: 40px;
+  padding: 0 0.6rem;
+  font-size: 1rem;
+}
+
+.chat-content-send-button {
+  height: 40px;
+  width: 40px;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.chat-content-send-button:hover {
+  background-color: var(--button-hover);
+}

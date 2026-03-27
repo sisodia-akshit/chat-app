@@ -1,0 +1,109 @@
+.chatCard {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 1rem;
+}
+.chatCard:hover {
+  background-color: #eee;
+}
+
+.chatCard-image {
+  width: fit-content;
+  height: fit-content;
+  border: none;
+  display: flex;
+  padding: 0;
+  background-color: transparent;
+}
+.chat-photo {
+  min-width: 45px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.chatCard-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  width: 100%;
+  height: 70px;
+  box-sizing: border-box;
+  padding: 1rem 0;
+  padding-left: 0.6rem;
+  border: none;
+  background-color: transparent;
+
+  & .chatCard-content-top {
+    overflow: hidden;
+    text-transform: capitalize;
+  }
+  & .chatCard-content-main {
+    font-size: 0.8rem;
+    color: #999;
+    overflow: hidden;
+  }
+}
+
+.chatCard-detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  align-items: end;
+
+  & .chatCard-detail-time {
+    color: #999;
+    font-size: 0.8rem;
+  }
+
+  & .chatCard-detail-seen {
+    font-size: 0.8rem;
+  }
+}
+
+/* user Card  */
+/* user Card  */
+/* user Card  */
+.userCard-end {
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* send Message card  */
+/* send Message card  */
+/* send Message card  */
+.sendMessageCard {
+  width: fit-content;
+  max-width: 70%;
+  height: fit-content;
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 10px;
+  border-bottom-right-radius: 0px;
+  padding: 0.5rem;
+  /* margin-right: 1rem; */
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.receiveMessageCard {
+  width: fit-content;
+  max-width: 70%;
+  height: fit-content;
+  background-color: #eee;
+  border-radius: 10px;
+  border-bottom-left-radius: 0px;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

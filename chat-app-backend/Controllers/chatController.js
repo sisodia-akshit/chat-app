@@ -1,0 +1,64 @@
+const { getIO } = require("../Config/socket");
+const Chat = require("../Models/Chat");
+const PrivateMessage = require("../Models/PrivateMessage");
+const User = require("../Models/User");
+const asyncErrorHandler = require("../Utils/asyncErrorHandler");
+
+exports.getOrCreateChat = asyncErrorHandler(async (req, res) => {
+  const senderId = req.user._id;
+  const { receiverId } = req.body;
+
+  const receiver = await User.findById(receiverId);
+  if (!receiver) {
+    return next(new CustomError("User not found!!", 404));
+  }
+
+  // 1. try to find existing chat
+  let chat = await Chat.findOne({
+    members: { $all: [senderId, receiverId] },
+  })?.populate("members", "name email photo");
+
+  // 2. if not found → create new chat
+  if (!chat) {
+    chat = await Chat.create({
+      members: [senderId, receiverId],
+      lastMessage: null, // no messages yet
+    });
+
+    req.user?.previousChats?.unshift(chat._id);
+    await req.user.save();
+
+    receiver?.previousChats?.unshift(chat._id);
+    await receiver.save();
+
+    const message = await PrivateMessage.create({
+      chatId: chat._id,
+      sender: req.user._id.toString(),
+      receiver: receiverId,
+      content: `Hello ${receiver.name}`,
+    });
+    getIO().to(chat._id).emit("newMessage", message);
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: chat,
+  });
+});
+
+exports.getPreviousChats = asyncErrorHandler(async (req, res, next) => {
+  const sender = req.user;
+
+  const chats = await Chat.find({
+    _id: { $in: sender?.previousChats },
+  }).populate("members", "name email photo");
+
+  if (!chats) {
+    return next(new CustomError("No prev chats!", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: chats,
+  });
+});
