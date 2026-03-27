@@ -44,41 +44,23 @@ const initSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log(socket?.user?._id.toString());
     socket.join(socket?.user?._id.toString());
-    console.log(`${socket?.user?.name} Connected`, socket.id);
+    console.log(`${socket?.user?.name} Connected`);
 
     socket.on("joinChat", async (chatId) => {
       socket.join(chatId);
-      console.log(`${socket.user.name} joins ${chatId}`);
-    });
-    socket.on("seenMessage", async (chatId) => {
-      const chat = await Chat.findById(chatId);
-      if (!chat) {
-        return socket.emit("error", "Chat not found");
-      }
-
-      const receiver = chat?.members.find(
-        (curr) => curr._id.toString() !== socket?.user?._id.toString(),
-      );
-
-      await PrivateMessage.updateMany(
-        {
-          sender: receiver._id,
-          receiver: socket?.user?._id,
-          seen: false,
-        },
-        { $set: { seen: true } },
-      );
-
       socket.to(chatId).emit("updateSeen", "message seen");
+      console.log(`${socket.user.name} joins ${chatId}`);
     });
 
     socket.on("sendMessage", async (data) => {
       try {
         const content = data?.content;
-        const sender = socket?.user;
         const chatId = data?.chatId;
+        const receiverId = data?.receiverId;
+
+        const sender = socket?.user;
+        const senderId = sender._id.toString();
 
         if (!mongoose.Types.ObjectId.isValid(chatId)) {
           return socket.emit("error", "Invalid chatId");
@@ -92,18 +74,27 @@ const initSocket = (server) => {
           return socket.emit("error", "Chat not found");
         }
 
-        const receiver = chat?.members.find(
-          (curr) => curr._id.toString() !== sender._id.toString(),
-        );
+        const receiver = await User.findById(receiverId);
 
+        // add Message to db
         const message = await PrivateMessage.create({
           chatId,
-          sender: sender._id.toString(),
-          receiver,
+          sender: senderId,
+          receiver: receiverId,
           content,
         });
 
-        //  update lastMessage
+        // add new chat in prevChats list
+        if (!sender.previousChats.includes(chatId)) {
+          sender.previousChats.unshift(chatId);
+          await sender.save();
+        }
+        if (!receiver.previousChats.includes(chatId)) {
+          receiver.previousChats?.unshift(chatId);
+          await receiver.save();
+        }
+
+        //  update lastMessage in db
         const updatedChat = await Chat.findByIdAndUpdate(
           chatId,
           {
@@ -117,9 +108,35 @@ const initSocket = (server) => {
         ).populate("members", "name email photo");
 
         getIO().to(chatId).emit("newMessage", message);
-        getIO().to(receiver._id.toString()).emit("updateChat", updatedChat);
+        getIO().to([receiverId, senderId]).emit("updateChat", updatedChat);
       } catch (error) {
-        console.log(err);
+        console.log(error);
+        socket.emit("error", "Something went wrong");
+      }
+    });
+
+    socket.on("seenMessage", async ({ chatId, receiverId }) => {
+      try {
+        const chat = await Chat.findById(chatId);
+        if (!chat) {
+          return socket.emit("error", "Chat not found");
+        }
+        const sender = socket.user;
+
+        const senderId = sender._id.toString();
+
+        await PrivateMessage.updateMany(
+          {
+            sender: receiverId,
+            receiver: senderId,
+            seen: false,
+          },
+          { $set: { seen: true } },
+        );
+
+        socket.to(chatId).emit("updateSeen", "message seen");
+      } catch (error) {
+        console.log(error);
         socket.emit("error", "Something went wrong");
       }
     });

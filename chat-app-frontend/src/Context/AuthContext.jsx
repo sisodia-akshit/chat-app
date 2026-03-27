@@ -13,9 +13,7 @@ export const AuthProvider = ({ children }) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ["me"],
         queryFn: getMe,
-        retry: false,
-        // refetchOnWindowFocus: false,
-        keepPreviousData: true
+        // retry: false,
     })
 
     const me = data?.user ?? undefined
@@ -33,6 +31,7 @@ export const AuthProvider = ({ children }) => {
     }
     const logout = () => {
         logoutMutation.mutate()
+        queryClient.invalidateQueries(["me"])
         navigate("/auth")
 
     }

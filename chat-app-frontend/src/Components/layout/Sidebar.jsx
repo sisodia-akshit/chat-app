@@ -8,7 +8,7 @@ import { useRef } from 'react'
 import { useAuth } from '../../Context/AuthContext'
 
 function Sidebar() {
-    const { logout } = useAuth();
+    const { me, logout } = useAuth();
     const logoutClickedHandler = () => {
         logout();
     }
@@ -29,7 +29,7 @@ function Sidebar() {
             <div className="sidebar-bottom">
                 <p>©2026 StayWise, All rights reserved.</p>
                 <p>Terms of use</p>
-                <button type='button' className='logout-button' onClick={logoutClickedHandler}><FaRightFromBracket /><span className="aside-name">Logout</span></button>
+                <button type='button' className='logout-button' onClick={logoutClickedHandler}><FaRightFromBracket /><span className="aside-name">Logout {me?.name}</span></button>
             </div>
         </aside>
     )

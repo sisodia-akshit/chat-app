@@ -66,7 +66,8 @@ function Chat({ id, user, chatId }) {
 
     useEffect(() => {
         const handler = (message) => {
-            socket.emit("seenMessage", chatId)
+            socket.emit("seenMessage", { chatId, receiverId: id })
+
             queryClient.setQueryData(["messages", id], (oldData) => {
                 if (!oldData) return oldData;
 
@@ -93,7 +94,6 @@ function Chat({ id, user, chatId }) {
 
     useEffect(() => {
         const handler = (message) => {
-            console.log(message)
             queryClient.setQueryData(["messages", id], (oldData) => {
                 if (!oldData) return oldData;
 
@@ -122,33 +122,33 @@ function Chat({ id, user, chatId }) {
         return () => socket.off("updateSeen", handler)
     }, [queryClient, id])
 
-    useEffect(() => {
-        const handler = ({ by }) => {
-            queryClient.setQueryData(["messages", id], (oldData) => {
-                if (!oldData) return oldData;
+    // useEffect(() => {
+    //     const handler = ({ by }) => {
+    //         queryClient.setQueryData(["messages", id], (oldData) => {
+    //             if (!oldData) return oldData;
 
-                return {
-                    ...oldData,
-                    pages: oldData.pages.map((page, index) => {
-                        if (index === 0) {
-                            return {
-                                ...page,
-                                data: page.data.map((msg) => ({
-                                    ...msg,
-                                    seen: true,
-                                })),
-                            };
-                        }
-                        return page;
-                    }),
-                };
-            })
+    //             return {
+    //                 ...oldData,
+    //                 pages: oldData.pages.map((page, index) => {
+    //                     if (index === 0) {
+    //                         return {
+    //                             ...page,
+    //                             data: page.data.map((msg) => ({
+    //                                 ...msg,
+    //                                 seen: true,
+    //                             })),
+    //                         };
+    //                     }
+    //                     return page;
+    //                 }),
+    //             };
+    //         })
 
-        }
-        socket.on("messagesSeen", handler)
+    //     }
+    //     socket.on("messagesSeen", handler)
 
-        return () => socket.off("messagesSeen", handler)
-    }, [queryClient, id])
+    //     return () => socket.off("messagesSeen", handler)
+    // }, [queryClient, id])
 
 
 

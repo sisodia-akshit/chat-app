@@ -17,8 +17,6 @@ function Chats({ activeId }) {
     const { data, isLoading, error } = useQuery({
         queryKey: ["previousChatUsers"],
         queryFn: getPrevChats,
-        retry: false,
-        keepPreviousData: true
     })
     const users = data?.data ?? []
 
@@ -27,12 +25,12 @@ function Chats({ activeId }) {
             queryClient.setQueryData(["previousChatUsers"], (old) => {
                 if (!old) return old;
 
-                const data = {
-                    ...old,
-                    data: old?.data.map(curr => curr._id === chat._id ? chat : curr)
-                }
-                return data
+                const filtered = old.data.filter(c => c._id !== chat._id);
 
+                return {
+                    ...old,
+                    data: [chat, ...filtered]
+                };
             })
         }
         socket.on("updateChat", handler)

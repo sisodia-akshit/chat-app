@@ -5,8 +5,8 @@ const User = require("../Models/User");
 const asyncErrorHandler = require("../Utils/asyncErrorHandler");
 
 exports.getOrCreateChat = asyncErrorHandler(async (req, res) => {
-  const senderId = req.user._id;
-  const { receiverId } = req.body;
+  const senderId = req.user._id.toString();
+  const receiverId = req?.body?.receiverId.toString();
 
   const receiver = await User.findById(receiverId);
   if (!receiver) {
@@ -25,19 +25,19 @@ exports.getOrCreateChat = asyncErrorHandler(async (req, res) => {
       lastMessage: null, // no messages yet
     });
 
-    req.user?.previousChats?.unshift(chat._id);
-    await req.user.save();
+    // req.user?.previousChats?.unshift(chat._id);
+    // await req.user.save();
 
-    receiver?.previousChats?.unshift(chat._id);
-    await receiver.save();
+    // receiver?.previousChats?.unshift(chat._id);
+    // await receiver.save();
 
-    const message = await PrivateMessage.create({
-      chatId: chat._id,
-      sender: req.user._id.toString(),
-      receiver: receiverId,
-      content: `Hello ${receiver.name}`,
-    });
-    getIO().to(chat._id).emit("newMessage", message);
+    // const message = await PrivateMessage.create({
+    //   chatId: chat._id,
+    //   sender: req.user._id.toString(),
+    //   receiver: receiverId,
+    //   content: `Hello ${receiver.name}`,
+    // });
+    // getIO().to(chat._id).emit("newMessage", message);
   }
 
   res.status(200).json({

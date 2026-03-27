@@ -7,16 +7,19 @@ import { useQuery } from '@tanstack/react-query'
 import { getOrCreateChat } from '../Services/chatsApi'
 import Loading from '../Components/ui/Loading'
 import socket from '../Lib/socket'
+import { useAuth } from '../Context/AuthContext'
 
 function PrivateMessages() {
   const { id } = useParams();
+  const { me } = useAuth();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["chat", id],
     queryFn: () => getOrCreateChat({ id }),
-    keepPreviousData: true,
+    // keepPreviousData: true,
   })
   const chat = data?.data ?? {}
+
   useEffect(() => {
     if (!chat?._id) return;
 

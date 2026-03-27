@@ -43,7 +43,7 @@ exports.sendPrivateMessage = asyncErrorHandler(async (req, res, next) => {
   //   },
   // });
 
-  getIO().to([receiver, sender._id.toString()]).emit("newMessage", message);
+  // getIO().to([receiver, sender._id.toString()]).emit("newMessage", message);
 
   res.status(201).json({
     status: "success",
@@ -92,9 +92,9 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
 
   const length = await PrivateMessage.countDocuments(query);
 
-  getIO().to(chatId).emit("messagesSeen", {
-    by: sender,
-  });
+  // getIO().to(chatId).emit("messagesSeen", {
+  //   by: sender,
+  // });
 
   res.status(200).json({
     status: "success",

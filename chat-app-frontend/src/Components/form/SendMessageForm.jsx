@@ -151,10 +151,10 @@ function SendMessageForm({ id, chatId, content, setContent }) {
         if (files) {
             uploadMutation.mutate({ id: chatId, files })
         } else {
-            // sendPrivateMessageMutation.mutate({ id, content });
             socket.emit("sendMessage", {
-                chatId: chatId,
-                content
+                chatId,
+                content,
+                receiverId: id
             })
 
             setContent("")
