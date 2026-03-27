@@ -63,10 +63,10 @@ function Chat({ id, user, chatId }) {
             }, 400)
         }
     }
-    // console.log(messages)
 
     useEffect(() => {
         const handler = (message) => {
+            socket.emit("seenMessage", chatId)
             queryClient.setQueryData(["messages", id], (oldData) => {
                 if (!oldData) return oldData;
 
@@ -88,6 +88,38 @@ function Chat({ id, user, chatId }) {
         socket.on("newMessage", handler)
 
         return () => socket.off("newMessage", handler)
+    }, [queryClient, id])
+
+
+    useEffect(() => {
+        const handler = (message) => {
+            console.log(message)
+            queryClient.setQueryData(["messages", id], (oldData) => {
+                if (!oldData) return oldData;
+
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page, index) => {
+                        if (index === 0) {
+                            return {
+                                ...page,
+                                data: page.data.map(curr => {
+                                    return {
+                                        ...curr,
+                                        seen: true
+                                    }
+                                }),
+                            };
+                        }
+                        return page;
+                    }),
+                };
+            })
+
+        }
+        socket.on("updateSeen", handler)
+
+        return () => socket.off("updateSeen", handler)
     }, [queryClient, id])
 
     useEffect(() => {

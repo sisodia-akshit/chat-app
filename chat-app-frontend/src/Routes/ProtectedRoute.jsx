@@ -10,8 +10,8 @@ function ProtectedRoute({ children }) {
 
     const navigate = useNavigate();
 
+    if (!me) navigate("/auth")
     if (isLoading) return <Loading />
-    if (!isLoading && !me) navigate("/auth")
     if (error) return <Error error={error} />
     return (
         <>{children}</>

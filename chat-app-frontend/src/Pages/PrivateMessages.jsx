@@ -3,7 +3,6 @@ import Layout from '../Components/layout/Layout'
 import Chats from '../Components/ui/Chats'
 import Chat from '../Components/ui/Chat'
 import { useParams } from 'react-router-dom'
-import { getUserById } from '../Services/userAPI'
 import { useQuery } from '@tanstack/react-query'
 import { getOrCreateChat } from '../Services/chatsApi'
 import Loading from '../Components/ui/Loading'
@@ -21,9 +20,20 @@ function PrivateMessages() {
   useEffect(() => {
     if (!chat?._id) return;
 
-    socket.emit("joinChat", chat._id);
+    const join = () => {
+      socket.emit("joinChat", chat._id);
+    };
 
-  }, [chat?._id, id])
+    if (socket.connected) join();
+
+    socket.on("connect", join);
+
+    return () => {
+      socket.emit("leaveChat", chat._id);
+      socket.off("connect", join);
+    };
+
+  }, [chat?._id])
 
   if (isLoading) return <Loading />
   return (

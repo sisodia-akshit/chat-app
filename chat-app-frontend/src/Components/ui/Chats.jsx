@@ -1,6 +1,6 @@
 import "../../Styles/Chats.css"
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { getPrevChatUsers } from '../../Services/userAPI'
 
@@ -8,18 +8,36 @@ import UsersList from '../common/UsersList'
 import NoChat from './NoChat'
 import Loading from './Loading'
 import { getPrevChats } from "../../Services/chatsApi"
+import { useEffect } from "react"
+import socket from "../../Lib/socket"
 
 
 function Chats({ activeId }) {
+    const queryClient = useQueryClient();
     const { data, isLoading, error } = useQuery({
         queryKey: ["previousChatUsers"],
-        // queryFn: getPrevChatUsers,
         queryFn: getPrevChats,
         retry: false,
         keepPreviousData: true
     })
     const users = data?.data ?? []
-    // console.log(users)
+
+    useEffect(() => {
+        const handler = (chat) => {
+            queryClient.setQueryData(["previousChatUsers"], (old) => {
+                if (!old) return old;
+
+                const data = {
+                    ...old,
+                    data: old?.data.map(curr => curr._id === chat._id ? chat : curr)
+                }
+                return data
+
+            })
+        }
+        socket.on("updateChat", handler)
+        return () => socket.off("newMessage", handler)
+    }, [queryClient])
 
     if (!isLoading && users.length === 0) return <div className="noUser-state"><NoChat /></div>
     if (isLoading) return <Loading />

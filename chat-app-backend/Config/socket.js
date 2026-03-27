@@ -44,11 +44,34 @@ const initSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("Socket Connected", socket.id);
+    console.log(socket?.user?._id.toString());
+    socket.join(socket?.user?._id.toString());
+    console.log(`${socket?.user?.name} Connected`, socket.id);
 
-    socket.on("joinChat", (chatId) => {
+    socket.on("joinChat", async (chatId) => {
       socket.join(chatId);
       console.log(`${socket.user.name} joins ${chatId}`);
+    });
+    socket.on("seenMessage", async (chatId) => {
+      const chat = await Chat.findById(chatId);
+      if (!chat) {
+        return socket.emit("error", "Chat not found");
+      }
+
+      const receiver = chat?.members.find(
+        (curr) => curr._id.toString() !== socket?.user?._id.toString(),
+      );
+
+      await PrivateMessage.updateMany(
+        {
+          sender: receiver._id,
+          receiver: socket?.user?._id,
+          seen: false,
+        },
+        { $set: { seen: true } },
+      );
+
+      socket.to(chatId).emit("updateSeen", "message seen");
     });
 
     socket.on("sendMessage", async (data) => {
@@ -72,7 +95,7 @@ const initSocket = (server) => {
         const receiver = chat?.members.find(
           (curr) => curr._id.toString() !== sender._id.toString(),
         );
-        
+
         const message = await PrivateMessage.create({
           chatId,
           sender: sender._id.toString(),
@@ -81,23 +104,32 @@ const initSocket = (server) => {
         });
 
         //  update lastMessage
-        await Chat.findByIdAndUpdate(chatId, {
-          lastMessage: {
-            content: message.content,
-            sender: message.sender,
-            createdAt: message.createdAt,
+        const updatedChat = await Chat.findByIdAndUpdate(
+          chatId,
+          {
+            lastMessage: {
+              content: message.content,
+              sender: message.sender,
+              createdAt: message.createdAt,
+            },
           },
-        });
+          { returnDocument: "after" },
+        ).populate("members", "name email photo");
 
         getIO().to(chatId).emit("newMessage", message);
+        getIO().to(receiver._id.toString()).emit("updateChat", updatedChat);
       } catch (error) {
         console.log(err);
         socket.emit("error", "Something went wrong");
       }
     });
 
+    socket.on("leaveChat", (message) => {
+      console.log(`leaveChat ${message}`);
+    });
+
     socket.on("disconnect", () => {
-      console.log("Socket disconnected:", socket.id);
+      console.log(`${socket?.user?.name} disconnected:`, socket.id);
     });
   });
 

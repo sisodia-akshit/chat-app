@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ["me"],
         queryFn: getMe,
-        // retry: false,
+        retry: false,
         // refetchOnWindowFocus: false,
         keepPreviousData: true
     })

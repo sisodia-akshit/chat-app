@@ -69,14 +69,8 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
 
   const page = req?.query?.page || 1;
   const limit = req?.query?.limit || 20;
-  // const skip = (page - 1) * limit;
 
-  // const query = {
-  //   $or: [
-  //     { sender: req.user._id.toString(), receiver: req.params.id },
-  //     { sender: req.params.id, receiver: req.user._id.toString() },
-  //   ],
-  // };
+
   const query = {
     chatId: chatId,
   };

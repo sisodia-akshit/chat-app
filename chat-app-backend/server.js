@@ -37,15 +37,15 @@ setServer();
 process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION! Shutting down...");
   console.error(err.name, err.message);
-  server.close(() => process.exit(1));
+  httpServer.close(() => process.exit(1));
 });
 
 process.on("SIGTERM", () => {
   console.log("SIGTERM received. Shutting down...");
-  server.close(() => process.exit(0));
+  httpServer.close(() => process.exit(0));
 });
 
 process.on("SIGINT", () => {
   console.log("SIGINT received. Shutting down...");
-  server.close(() => process.exit(0));
+  httpServer.close(() => process.exit(0));
 });
