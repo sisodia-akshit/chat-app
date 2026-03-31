@@ -1,11 +1,8 @@
-
-import { FaCheck } from 'react-icons/fa6'
-
 import "../../Styles/Cards.css"
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../Context/AuthContext';
-import socket from '../../Lib/socket';
+import { decryptMessage } from '../../Hooks/useEncryptMessage';
 
 function ChatCard({ data }) {
     const { me } = useAuth();
@@ -13,6 +10,8 @@ function ChatCard({ data }) {
     const navigate = useNavigate();
 
     const receiver = data?.members.find(curr => curr._id !== me._id)
+
+    const content = decryptMessage(data?.lastMessage?.content, data?.lastMessage?.nonce, receiver?.publicKey, localStorage.getItem("privateKey"))
 
     const imageClickedHandler = () => {
         navigate(`/users/${receiver._id}`)
@@ -30,7 +29,7 @@ function ChatCard({ data }) {
             </button>
             <button className="chatCard-content" onClick={cardClickedHandler}>
                 <h4 className='chatCard-content-top'>{receiver?.name}</h4>
-                <p className="chatCard-content-main">{data?.lastMessage?.content}</p>
+                <p className="chatCard-content-main">{content}</p>
             </button>
             {/* <div className="chatCard-detail">
                 <p className="chatCard-detail-time">10:23</p>

@@ -7,17 +7,19 @@ import Messages from "./Messages";
 import SendMessageForm from "../form/SendMessageForm";
 import { useEffect, useRef, useState } from "react";
 import { getPrivateMessage } from "../../Services/MessageAPI";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import socket from "../../Lib/socket";
 import ProfileUserDetails from "../common/ProfileUserDetails";
+import { getUserById } from "../../Services/userAPI";
 
-function Chat({ id, user, chatId }) {
+function Chat({ id, receiver, chatId }) {
     const queryClient = useQueryClient();
 
     const [content, setContent] = useState("")
     const [scroll, setScroll] = useState(true);
 
     const chatRef = useRef();
+
 
 
     const {
@@ -42,7 +44,6 @@ function Chat({ id, user, chatId }) {
                 ? totalLoaded + 20
                 : undefined;
         },
-        // keepPreviousData: true,
     });
 
     const messages = data?.pages
@@ -122,56 +123,26 @@ function Chat({ id, user, chatId }) {
         return () => socket.off("updateSeen", handler)
     }, [queryClient, id])
 
-    // useEffect(() => {
-    //     const handler = ({ by }) => {
-    //         queryClient.setQueryData(["messages", id], (oldData) => {
-    //             if (!oldData) return oldData;
-
-    //             return {
-    //                 ...oldData,
-    //                 pages: oldData.pages.map((page, index) => {
-    //                     if (index === 0) {
-    //                         return {
-    //                             ...page,
-    //                             data: page.data.map((msg) => ({
-    //                                 ...msg,
-    //                                 seen: true,
-    //                             })),
-    //                         };
-    //                     }
-    //                     return page;
-    //                 }),
-    //             };
-    //         })
-
-    //     }
-    //     socket.on("messagesSeen", handler)
-
-    //     return () => socket.off("messagesSeen", handler)
-    // }, [queryClient, id])
-
-
-
     return (
         <div className="chat">
             {/* head  */}
             <div className="chat-top">
                 <ButtonGoBack />
 
-                <UserCard user={user} >
+                <UserCard receiver={receiver} >
                     {/* <FaEllipsisV /> */}
                 </UserCard>
             </div>
 
             {/* main  */}
             <div ref={chatRef} className="chat-main" onScroll={messageScrollHandler}>
-                <Messages id={id} content={content} messages={messages} />
+                <Messages receiver={receiver} id={id} content={content} messages={messages} />
                 {isFetchingNextPage || !scroll && <div className="loader"></div>}
                 {/* {!scroll && <ProfileUserDetails user={user} />} */}
             </div>
 
             {/* input  */}
-            <SendMessageForm id={id} chatId={chatId} content={content} setContent={setContent} />
+            <SendMessageForm receiver={receiver} id={id} chatId={chatId} content={content} setContent={setContent} />
         </div>
     )
 }

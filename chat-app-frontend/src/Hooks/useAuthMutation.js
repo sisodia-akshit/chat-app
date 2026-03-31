@@ -1,5 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { loginUser, registerUser, verifyUser } from "../Services/authAPI";
+import {
+  loginUser,
+  registerUser,
+  setOtp,
+  verifyUser,
+} from "../Services/authAPI";
 import { useAuth } from "../Context/AuthContext";
 
 export const getLoginMutation = () => {
@@ -13,30 +18,38 @@ export const getLoginMutation = () => {
   });
 };
 
-export const getRegisterMutation = ({
-  setContinue,
-  setMessage,
-  setName,
-  setPassword,
-}) => {
+export const getOtpMutation = ({ setNext, setName, setEmail }) => {
   return useMutation({
-    mutationFn: registerUser,
+    mutationFn: setOtp,
     onSuccess: (data) => {
-      setContinue(true);
-      console.log(data);
-      setMessage(data?.message);
+      localStorage.setItem("verificationId", data?.data);
+      setNext(true);
       setName("");
-      setPassword("");
+      setEmail("");
     },
   });
 };
 
-export const getVerifyMutation = ({ setMessage }) => {
-  const { login } = useAuth();
+export const getVerifyMutation = ({ setContinue, setMessage }) => {
   return useMutation({
     mutationFn: verifyUser,
     onSuccess: (data) => {
+      localStorage.clear();
+      localStorage.setItem("userId", data.data);
+      setContinue(true);
       setMessage("");
+    },
+  });
+};
+
+export const getRegisterMutation = ({ setPassword, setConPassword }) => {
+  const { login } = useAuth();
+  return useMutation({
+    mutationFn: registerUser,
+    onSuccess: () => {
+      localStorage.removeItem("userId");
+      setPassword("");
+      setConPassword("");
       login();
     },
   });

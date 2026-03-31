@@ -1,8 +1,10 @@
+import nacl from "tweetnacl";
+import * as util from "tweetnacl-util";
 
 import '../../Styles/Auth.css'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import { useRef, useState } from 'react'
-import { getRegisterMutation, getVerifyMutation } from '../../Hooks/useAuthMutation'
+import { getOtpMutation, getRegisterMutation, getVerifyMutation } from '../../Hooks/useAuthMutation'
 
 function Register({ isNext, setNext, isContinue, setContinue, }) {
   const [message, setMessage] = useState("")
@@ -19,23 +21,26 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
   const input3Ref = useRef(null);
   const input4Ref = useRef(null);
 
-  const useRegisterMutation = getRegisterMutation({ setContinue, setMessage, setName, setPassword });
-  const useVerifyMutation = getVerifyMutation({ setMessage });
+  const useOtpMutation = getOtpMutation({ setNext, setEmail, setName });
+  const useVerifyMutation = getVerifyMutation({ setContinue, setMessage });
+  const useRegisterMutation = getRegisterMutation({ setPassword, setConPassword });
 
+
+  const nextClickedHandler = (e) => {
+    e.preventDefault()
+    useOtpMutation.mutate({
+      name,
+      email
+    })
+  }
 
   const continueClickedHandler = (e) => {
     e.preventDefault()
-    if (password !== conPassword) {
-      setError(`"Password" and "Confirm Password" must be same!`);
-      return
-    }
-
-    const data = {
-      name,
-      email,
-      password
-    }
-    useRegisterMutation.mutate(data)
+    const otp = input1Ref.current.value + input2Ref.current.value + input3Ref.current.value + input4Ref.current.value;
+    useVerifyMutation.mutate({
+      id: localStorage.getItem("verificationId"),
+      otp
+    })
 
   }
 
@@ -52,17 +57,33 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    const otp = input1Ref.current.value + input2Ref.current.value + input3Ref.current.value + input4Ref.current.value;
-    useVerifyMutation.mutate({ otp, email })
+
+    if (password !== conPassword) {
+      setError(`"Password" and "Confirm Password" must be same!`);
+      return
+    }
+
+    // Generate Keys for ETEE 
+    const keyPair = nacl.box.keyPair();
+
+    const publicKey = util.encodeBase64(keyPair.publicKey);
+    const privateKey = util.encodeBase64(keyPair.secretKey);
+
+    // store privateKey
+    localStorage.setItem("privateKey", privateKey);
+
+    useRegisterMutation.mutate({
+      userId: localStorage.getItem("userId"),
+      password,
+      publicKey
+    })
   }
 
   return (
-
     <>
       {/* get name & email  */}
       {!isNext && !isContinue &&
-
-        <form className="auth-form" onSubmit={() => setNext(true)}>
+        <form className="auth-form" onSubmit={nextClickedHandler}>
           <label htmlFor="name">Name<span>*</span></label>
           <input name='name' type="text" value={name} onChange={(e) => setName(e.target.value)} className="auth-name-input" placeholder='Enter your name' required />
 
@@ -73,32 +94,12 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
         </form>
 
       }
-      {/* get password  */}
+
+      {/* verify otp  */}
       {isNext && !isContinue && <>
-        <h2 className="auth-greetings">Create Password</h2>
-
-        <form className="auth-form" onSubmit={continueClickedHandler}>
-
-          <label htmlFor="password">Password<span>*</span></label>
-          <input name='password' type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Enter your password' required />
-
-          <label htmlFor="confirmPassword">Confirm password<span>*</span></label>
-          <input name='confirmPassword' type="password" value={conPassword} onChange={(e) => setConPassword(e.target.value)} placeholder='Enter your password' required />
-
-          <p className='formError'>{error}</p>
-          <p className='formError'>{useRegisterMutation?.failureReason?.response?.data?.message}</p>
-
-          <div className="flex">
-            <button type='button' className="auth-login-button" onClick={() => setNext(false)}><FaArrowLeft />Go back</button>
-            <button type='submit' className="auth-login-button">Continue<FaArrowRight /></button>
-          </div>
-        </form>
-      </>}
-
-      {isNext && isContinue && <>
         <h2 className="auth-greetings">Verify Email</h2>
         <p className="auth-sub-greetings">{message}</p>
-        <form className="auth-form" onSubmit={onSubmitHandler}>
+        <form className="auth-form" onSubmit={continueClickedHandler}>
           <label htmlFor="otp">Enter OTP<span>*</span></label>
           <div className="otp-inputs" >
             <input name='otp' type="String" ref={input1Ref} onChange={(e) => handleChange(e, input2Ref)} required maxLength="1" pattern="\d*" inputMode="numeric" className='otpInput' />
@@ -111,6 +112,27 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
           <p className="auth-sub-greetings">OTP is valid for two minutes.</p>
 
           <button type='submit' className="auth-login-button" >Verify<FaArrowRight /></button>
+        </form>
+      </>}
+
+      {/* get password  */}
+      {isNext && isContinue && <>
+        <h2 className="auth-greetings">Create Password</h2>
+
+        <form className="auth-form" onSubmit={onSubmitHandler}>
+
+          <label htmlFor="password">Password<span>*</span></label>
+          <input name='password' type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Enter your password' required />
+
+          <label htmlFor="confirmPassword">Confirm password<span>*</span></label>
+          <input name='confirmPassword' type="password" value={conPassword} onChange={(e) => setConPassword(e.target.value)} placeholder='Enter your password' required />
+
+          <p className='formError'>{error}</p>
+          <p className='formError'>{useRegisterMutation?.failureReason?.response?.data?.message}</p>
+
+          <div className="flex">
+            <button type='submit' className="auth-login-button">Continue<FaArrowRight /></button>
+          </div>
         </form>
       </>}
     </>

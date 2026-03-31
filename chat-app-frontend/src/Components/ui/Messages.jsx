@@ -8,7 +8,7 @@ import { FaX, FaXmark } from "react-icons/fa6"
 import { FaCheck, FaCheckDouble } from "react-icons/fa"
 
 
-function Messages({ id, content, messages }) {
+function Messages({ id, receiver, content, messages }) {
     const bottomRef = useRef(null);
 
     const [imageLink, setImageLink] = useState(null)
@@ -33,7 +33,7 @@ function Messages({ id, content, messages }) {
                 </button>
                 <img src={imageLink} alt="image" />
             </div>}
-            
+
             <div ref={bottomRef} />
             {messages.length > 0 && messages.map((curr, i) => {
                 if (curr?.sender === me?._id) {
@@ -75,7 +75,7 @@ function Messages({ id, content, messages }) {
                                 }
                             </ul>
                             {curr.content && <div className="messages-send-container">
-                                < SendMessageCard message={curr?.content} seen={curr.seen} />
+                                < SendMessageCard receiver={receiver} nonce={curr?.nonce} message={curr?.content} />
                                 <FaCheckDouble className="not-seen" color={curr.seen ? "#00d0ff" : ""} />
                             </div>}
                         </div >
@@ -118,7 +118,7 @@ function Messages({ id, content, messages }) {
                             }
                         </ul>
                         {curr.content &&
-                            <ReceiveMessageCard message={curr?.content} />
+                            <ReceiveMessageCard sender={receiver} nonce={curr?.nonce} message={curr?.content} />
                         }
                     </div>
                     )

@@ -25,17 +25,20 @@ const userSchema = new mongoose.Schema(
         "https://i.pinimg.com/736x/62/01/0d/62010d848b790a2336d1542fcda51789.jpg",
     },
     previousChats: {
-      // type: [String],
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+          ref: "Chat",
         },
       ],
       default: [],
     },
     archiveChats: {
       type: [String],
+    },
+    publicKey: {
+      type: String,
+      required: true,
     },
     isActive: {
       type: Boolean,
@@ -61,6 +64,12 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  this.password = await bcrypt.hash(this.password, 12);
+});
 
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);

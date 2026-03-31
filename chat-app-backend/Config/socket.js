@@ -58,9 +58,10 @@ const initSocket = (server) => {
         const content = data?.content;
         const chatId = data?.chatId;
         const receiverId = data?.receiverId;
+        const nonce = data?.nonce;
+        const senderId = data?.senderId;
 
         const sender = socket?.user;
-        const senderId = sender._id.toString();
 
         if (!mongoose.Types.ObjectId.isValid(chatId)) {
           return socket.emit("error", "Invalid chatId");
@@ -82,6 +83,7 @@ const initSocket = (server) => {
           sender: senderId,
           receiver: receiverId,
           content,
+          nonce,
         });
 
         // add new chat in prevChats list
@@ -100,12 +102,13 @@ const initSocket = (server) => {
           {
             lastMessage: {
               content: message.content,
+              nonce,
               sender: message.sender,
               createdAt: message.createdAt,
             },
           },
           { returnDocument: "after" },
-        ).populate("members", "name email photo");
+        ).populate("members", "name email photo publicKey");
 
         getIO().to(chatId).emit("newMessage", message);
         getIO().to([receiverId, senderId]).emit("updateChat", updatedChat);

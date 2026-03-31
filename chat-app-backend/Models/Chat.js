@@ -8,6 +8,10 @@ const chatSchema = mongoose.Schema(
     lastMessage: {
       type: {
         content: String,
+        nonce: {
+          type: String,
+          required: true,
+        },
         sender: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",

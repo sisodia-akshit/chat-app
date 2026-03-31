@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react'
 import { getMe } from '../Services/userAPI'
 import { useNavigate } from 'react-router-dom'
 import { logoutUser } from '../Services/authAPI'
+import { usePublicKeyMutation } from "../Hooks/useMutation";
 
 const AuthContext = createContext()
 
@@ -13,10 +14,12 @@ export const AuthProvider = ({ children }) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ["me"],
         queryFn: getMe,
-        // retry: false,
+        retry: false,
     })
 
     const me = data?.user ?? undefined
+
+    const publicKeyMutation = usePublicKeyMutation();
 
     const logoutMutation = useMutation({
         mutationFn: logoutUser,

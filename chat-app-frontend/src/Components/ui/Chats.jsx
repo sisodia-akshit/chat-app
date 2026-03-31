@@ -12,7 +12,7 @@ import { useEffect } from "react"
 import socket from "../../Lib/socket"
 
 
-function Chats({ activeId }) {
+function Chats({ activeId, receiver }) {
     const queryClient = useQueryClient();
     const { data, isLoading, error } = useQuery({
         queryKey: ["previousChatUsers"],

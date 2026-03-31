@@ -74,3 +74,16 @@ exports.getMe = (req, res) => {
     user,
   });
 };
+exports.setPublicKey = async (req, res, next) => {
+  let user = req.user;
+
+  const publicKey = req?.body?.publicKey;
+  user.publicKey = publicKey;
+
+  await user.save();
+
+  res.status(200).json({
+    status: "success",
+    user,
+  });
+};

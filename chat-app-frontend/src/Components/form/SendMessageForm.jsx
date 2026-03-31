@@ -1,14 +1,18 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import "../../Styles/Form.css"
 import { useEffect, useRef, useState } from "react";
 import { sendPrivateMessage } from "../../Services/MessageAPI";
 import { FaArrowRight, FaImage, FaMicrophone, FaPaperclip, FaPause, FaPlus, FaVideo } from "react-icons/fa";
 import { useUploadMutation } from "../../Hooks/useMutation";
 import socket from "../../Lib/socket";
+import { decryptMessage, encryptMessage } from "../../Hooks/useEncryptMessage";
+import { getUserById } from "../../Services/userAPI";
+import { useAuth } from "../../Context/AuthContext";
 
 
 
-function SendMessageForm({ id, chatId, content, setContent }) {
+function SendMessageForm({ id, receiver, chatId, content, setContent }) {
+    const { me } = useAuth();
     const [openFiles, setOpenFiles] = useState(false);
     const [files, setFiles] = useState(null);
     const [startRecord, setStartRecord] = useState(false);
@@ -22,17 +26,8 @@ function SendMessageForm({ id, chatId, content, setContent }) {
     const [audioFile, setAudioFile] = useState(null);
     const [seconds, setSeconds] = useState(0);
 
-    // const sendPrivateMessageMutation = useMutation({
-    //     mutationFn: sendPrivateMessage,
-    //     onSuccess: () => {
-    //         setContent("")
-    //         const preview = document.getElementById("preview");
-    //         preview.innerHTML = "";
-    //     },
-    //     onError: (error) => {
-    //         console.log(error?.response?.data?.message)
-    //     }
-    // })
+
+
     const uploadMutation = useUploadMutation({ setFiles })
 
     //!recording Logic
@@ -93,15 +88,10 @@ function SendMessageForm({ id, chatId, content, setContent }) {
 
     //!recording Logic
 
-
-
-
     const onContentChangeHandler = (e) => {
         setContent(e.target.value);
 
     }
-
-
 
     const fileInputHandler = (e) => {
         const files = e.target.files;
@@ -151,10 +141,14 @@ function SendMessageForm({ id, chatId, content, setContent }) {
         if (files) {
             uploadMutation.mutate({ id: chatId, files })
         } else {
+            const receiverPublicKey = receiver?.publicKey;
+            const { encrypted, nonce } = encryptMessage(content, localStorage.getItem("privateKey"), receiverPublicKey);
             socket.emit("sendMessage", {
                 chatId,
-                content,
-                receiverId: id
+                receiverId: id,
+                senderId: me?._id,
+                content: encrypted,
+                nonce,
             })
 
             setContent("")

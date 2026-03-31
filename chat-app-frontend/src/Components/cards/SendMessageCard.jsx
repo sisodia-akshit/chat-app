@@ -1,9 +1,10 @@
-import { FaCheck, FaCheckDouble } from "react-icons/fa"
+import { decryptMessage } from "../../Hooks/useEncryptMessage"
 import "../../Styles/Cards.css"
-function SendMessageCard({ message, seen }) {
+function SendMessageCard({ receiver, message, nonce }) {
+    const content = decryptMessage(message, nonce, receiver?.publicKey, localStorage.getItem("privateKey"))
     return (
         <p className="sendMessageCard">
-            {message} 
+            {content}
         </p>
     )
 }

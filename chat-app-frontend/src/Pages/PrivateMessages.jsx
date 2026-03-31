@@ -8,10 +8,10 @@ import { getOrCreateChat } from '../Services/chatsApi'
 import Loading from '../Components/ui/Loading'
 import socket from '../Lib/socket'
 import { useAuth } from '../Context/AuthContext'
+import { getUserById } from '../Services/userAPI'
 
 function PrivateMessages() {
   const { id } = useParams();
-  const { me } = useAuth();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["chat", id],
@@ -19,6 +19,12 @@ function PrivateMessages() {
     // keepPreviousData: true,
   })
   const chat = data?.data ?? {}
+
+  const data2 = useQuery({
+    queryKey: ["receiver", id],
+    queryFn: () => getUserById(id)
+  })
+  const receiver = data2?.data?.data ?? {}
 
   useEffect(() => {
     if (!chat?._id) return;
@@ -45,7 +51,7 @@ function PrivateMessages() {
         <Chats activeId={id} />
       </div>
       <div className="privateMessage-chat-page">
-        <Chat id={id} chatId={chat._id} user={chat} />
+        <Chat id={id} chatId={chat._id} receiver={receiver} />
       </div>
     </Layout>
   )

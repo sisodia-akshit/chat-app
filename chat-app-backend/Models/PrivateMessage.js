@@ -21,6 +21,10 @@ const privateMessageSchema = mongoose.Schema(
       trim: true,
       maxlength: 1000,
     },
+    nonce: {
+      type: String,
+      required: true,
+    },
     files: {
       type: [Object],
     },

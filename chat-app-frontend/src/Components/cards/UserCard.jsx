@@ -1,12 +1,8 @@
-
-import { useAuth } from "../../Context/AuthContext";
 import "../../Styles/Cards.css"
 import { useNavigate } from 'react-router-dom'
 
-function UserCard({ user, children }) {
-    const { me } = useAuth();
+function UserCard({ receiver, children }) {
     const navigate = useNavigate();
-    const receiver = user?.members?.find(curr => curr._id !== me._id)
 
     const imageClickedHandler = () => {
         navigate(`/users/${receiver?._id}`)

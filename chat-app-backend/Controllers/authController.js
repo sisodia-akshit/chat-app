@@ -6,6 +6,8 @@ const { sendAccessToken } = require("../Utils/token");
 const { cookieOptions, logoutOptions } = require("../Utils/cookieOptions");
 const Otp = require("../Models/Otp");
 const asyncErrorHandler = require("../Utils/asyncErrorHandler");
+const mongoose = require("mongoose");
+const VerifiedUser = require("../Models/VerifiedUser");
 
 const sendResponse = async (id, res, statusCode) => {
   const token = await sendAccessToken(id);
@@ -14,12 +16,14 @@ const sendResponse = async (id, res, statusCode) => {
 };
 
 exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
-  // const { name, email, password } = req.body;
   const name = req?.body?.name;
   const email = req?.body?.email.toLowerCase();
-  const password = req?.body?.password;
+  // const password = req?.body?.password;
 
-  if (!name || !email || !password) {
+  // if (!name || !email || !password) {
+  //   return next(new CustomError("All credentials required!", 400));
+  // }
+  if (!name || !email) {
     return next(new CustomError("All credentials required!", 400));
   }
 
@@ -28,6 +32,7 @@ exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
       new CustomError("User already exist with this email! Please login", 400),
     );
   }
+
   const isOtpExist = await Otp.findOne({ email });
   if (isOtpExist) {
     return next(new CustomError("Please wait before requesting again!", 400));
@@ -38,10 +43,10 @@ exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
 
   const hashOtp = crypto.createHash("sha256").update(otp).digest("hex");
 
-  await Otp.create({
+  const otpData = await Otp.create({
     name,
     email,
-    password,
+    // password,
     otp: hashOtp,
     expiresAt: Date.now() + 2 * 60 * 1000,
   });
@@ -53,7 +58,7 @@ exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "An OTP is send to the registered email!",
-      email,
+      data: otpData._id,
     });
   } catch (error) {
     return next(
@@ -63,14 +68,14 @@ exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
 });
 
 exports.verifyOtp = asyncErrorHandler(async (req, res, next) => {
-  const email = req?.body?.email.toLowerCase();
+  const otpId = req?.body?.id;
   const otp = req?.body?.otp;
 
-  if (!email || !otp) {
+  if (!otpId || !otp) {
     return next(new CustomError("All credentials required!", 400));
   }
 
-  const record = await Otp.findOne({ email });
+  const record = await Otp.findById(otpId);
 
   if (!record) return next(new CustomError("Invalid or expired OTP!", 400));
 
@@ -88,13 +93,45 @@ exports.verifyOtp = asyncErrorHandler(async (req, res, next) => {
     return next(new CustomError("Invalid or expired OTP!", 400));
   }
 
-  const user = await User.create({
+  const verifiedUser = await VerifiedUser.create({
     name: record.name,
     email: record.email,
-    password: record.password,
   });
 
-  await Otp.findOneAndDelete({ email });
+  await Otp.findByIdAndDelete(otpId);
+
+  res.status(200).json({
+    status: "success",
+    message: "Otp verified successfully",
+    data: verifiedUser._id,
+  });
+});
+
+exports.register = asyncErrorHandler(async (req, res, next) => {
+  const userId = req?.body?.userId;
+  const password = req?.body?.password;
+  const publicKey = req?.body?.publicKey;
+
+  if (!userId || !password || !publicKey) {
+    return next(new CustomError("All credentials required!", 400));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return next(new CustomError("Invalid receiver Id!", 400));
+  }
+
+  const verifiedUser = await VerifiedUser.findById(userId);
+
+  if (!verifiedUser) {
+    return next(new CustomError("Authentication timeout!", 404));
+  }
+
+  const user = await User.create({
+    name: verifiedUser.name,
+    email: verifiedUser.email,
+    password,
+    publicKey,
+  });
 
   sendResponse(user._id, res, 201);
 });

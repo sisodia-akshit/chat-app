@@ -24,3 +24,7 @@ export const getPrevChatUsers = async () => {
   const res = await API.get("users/previous-chats");
   return res.data;
 };
+export const setPublicKey = async (data) => {
+  const res = await API.post("users/public-key",data);
+  return res.data;
+};
