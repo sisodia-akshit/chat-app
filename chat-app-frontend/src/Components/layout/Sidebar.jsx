@@ -2,9 +2,8 @@
 import { NavLink } from 'react-router-dom'
 
 import "../../Styles/Sidebar.css"
-import { FaMessage, FaQuestion, FaRightFromBracket } from 'react-icons/fa6'
-import { FaArchive, FaQuestionCircle, FaSearch } from 'react-icons/fa'
-import { useRef } from 'react'
+import { FaMessage, FaRightFromBracket } from 'react-icons/fa6'
+import { FaSearch } from 'react-icons/fa'
 import { useAuth } from '../../Context/AuthContext'
 
 function Sidebar() {
@@ -19,10 +18,8 @@ function Sidebar() {
 
                 <nav className="sidebar-nav">
                     <ul className="nav-links">
-                        <li className="nav-link nav-link-search"><NavLink to={'/users'}><FaSearch color='#eee' /><span className="aside-name">Search</span></NavLink></li>
-                        <li className={"nav-link"}><NavLink to={'/'} className={({ isActive }) => isActive ? "nav-link-active" : ""}  ><FaMessage color='#eee' /><span className="aside-name">Chats</span></NavLink></li>
-                        {/* <li className="nav-link"><NavLink  ><FaArchive color='#eee' /><span className="aside-name">Archive</span></NavLink></li> */}
-                        {/* <li className="nav-link"><NavLink ><FaQuestionCircle color='#eee' /><span className="aside-name">Help</span></NavLink></li> */}
+                        <li className="nav-link nav-link-search"><NavLink to={'/users'} className={({ isActive }) => isActive ? "nav-link-active" : ""}><FaSearch className='aside-icon'/><span className="aside-name">Search</span></NavLink></li>
+                        <li className={"nav-link"}><NavLink to={'/'} className={({ isActive }) => isActive ? "nav-link-active" : ""}  ><FaMessage className='aside-icon' /><span className="aside-name">Chats</span></NavLink></li>
                     </ul>
                 </nav>
             </div>

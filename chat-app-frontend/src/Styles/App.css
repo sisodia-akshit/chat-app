@@ -55,6 +55,7 @@
 
 .usersList-empty {
   margin: auto;
+  width: fit-content;
 }
 
 .users-card-active {

@@ -26,9 +26,6 @@
   border-radius: 10px;
   border-bottom-left-radius: 0;
 }
-.aside-name {
-  color: #fff;
-}
 
 .nav-links {
   display: flex;
@@ -42,7 +39,7 @@
   border: 1px solid #ccc;
 }
 .nav-link-search:active {
-  outline: #ccc;
+  outline: #fff;
 }
 .nav-link {
   height: fit-content;
@@ -57,7 +54,7 @@
     align-items: center;
     border-radius: 25px;
     padding: 0 1rem;
-    color: #eee;
+    color: #ccc;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -65,14 +62,24 @@
 
   & span {
     font-size: 0.85rem;
+    color: #ccc;
+  }
+  & .aside-icon {
+    color: #ccc;
   }
 }
 .nav-link:hover {
   background-color: #fff2;
 }
-.nav-link-active{
-    background-color: #ffffff2e;
+.nav-link-active {
+  background-color: #ffffff2e;
 
+  & span {
+    color: #fff;
+  }
+  & .aside-icon {
+    color: #fff;
+  }
 }
 .nav-link:active {
   background-color: #ffffff2e;

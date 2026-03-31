@@ -7,7 +7,7 @@ import Error from "../Components/ui/Error";
 function ProtectedRoute({ children }) {
     const { me, isLoading, error } = useAuth();
 
-    if (isLoading) return <Loading />
+    if (isLoading) return <Loading margin={true} />
     if (!me) {
         return <Navigate to="/auth" replace />;
     }

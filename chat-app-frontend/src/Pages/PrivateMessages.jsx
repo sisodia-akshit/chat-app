@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import Layout from '../Components/layout/Layout'
 import Chats from '../Components/ui/Chats'
 import Chat from '../Components/ui/Chat'
@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getOrCreateChat } from '../Services/chatsApi'
 import Loading from '../Components/ui/Loading'
 import socket from '../Lib/socket'
-import { useAuth } from '../Context/AuthContext'
 import { getUserById } from '../Services/userAPI'
 
 function PrivateMessages() {
@@ -16,7 +15,6 @@ function PrivateMessages() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["chat", id],
     queryFn: () => getOrCreateChat({ id }),
-    // keepPreviousData: true,
   })
   const chat = data?.data ?? {}
 
@@ -44,7 +42,7 @@ function PrivateMessages() {
 
   }, [chat?._id])
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading margin={true} />
   return (
     <Layout>
       <div className="privateMessage-prevChats-page">
