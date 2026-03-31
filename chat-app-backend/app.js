@@ -37,7 +37,7 @@ app.use(cookieParser());
 
 app.use(express.json({ limit: "10kb" }));
 
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 
 // app.post("/api/v0/uploads", upload.single("file"), uploadHandler); // max 1 files
 // app.post("/api/v0/uploads/audio", upload.single("audio"), audioUploadHandler);
