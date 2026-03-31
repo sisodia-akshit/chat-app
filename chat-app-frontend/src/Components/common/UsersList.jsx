@@ -20,10 +20,11 @@ function UsersList({ data, chatCard, activeId }) {
     return (
         <>
             {data?.length > 0 && data?.map(curr => {
-                const receiver = curr?.members.find(curr => curr._id !== me._id)
+                let receiver;
+                receiver = curr?.members?.find(curr => curr._id !== me._id)
 
                 return (
-                    <div key={curr._id} className={activeId === receiver._id ? "users-card-active" : 'users-card'}  >
+                    <div key={curr._id} className={receiver && activeId === receiver?._id ? "users-card-active" : 'users-card'}  >
 
                         {!chatCard && <>
                             <div className="chatCard">
