@@ -10,8 +10,11 @@ function ChatCard({ data }) {
     const navigate = useNavigate();
 
     const receiver = data?.members.find(curr => curr._id !== me._id)
+    let content;
 
-    const content = decryptMessage(data?.lastMessage?.content, data?.lastMessage?.nonce, receiver?.publicKey, localStorage.getItem("privateKey"))
+    if (data?.lastMessage) {
+        content = decryptMessage(data?.lastMessage?.content, data?.lastMessage?.nonce, receiver?.publicKey, localStorage.getItem("privateKey"))
+    }
 
     const imageClickedHandler = () => {
         navigate(`/users/${receiver._id}`)
@@ -29,7 +32,7 @@ function ChatCard({ data }) {
             </button>
             <button className="chatCard-content" onClick={cardClickedHandler}>
                 <h4 className='chatCard-content-top'>{receiver?.name}</h4>
-                <p className="chatCard-content-main">{content}</p>
+                {content && <p className="chatCard-content-main">{content}</p>}
             </button>
             {/* <div className="chatCard-detail">
                 <p className="chatCard-detail-time">10:23</p>
