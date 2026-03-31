@@ -3,8 +3,11 @@ import ChatCard from "../cards/ChatCard"
 import UserCard from "../cards/UserCard"
 import ButtonFirstMessage from "./ButtonFirstMessage"
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 function UsersList({ data, chatCard, activeId }) {
+    const { me } = useAuth();
+
     const navigate = useNavigate();
     const imageClickedHandler = (id) => {
         navigate(`/users/${id}`)
@@ -13,12 +16,14 @@ function UsersList({ data, chatCard, activeId }) {
         navigate(`/users/${id}`)
     }
 
+
     return (
         <>
             {data?.length > 0 && data?.map(curr => {
+                const receiver = curr?.members.find(curr => curr._id !== me._id)
 
                 return (
-                    <div key={curr._id} className={activeId === curr._id ? "users-card-active" : 'users-card'}  >
+                    <div key={curr._id} className={activeId === receiver._id ? "users-card-active" : 'users-card'}  >
 
                         {!chatCard && <>
                             <div className="chatCard">
