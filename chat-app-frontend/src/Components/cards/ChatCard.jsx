@@ -25,6 +25,8 @@ function ChatCard({ data }) {
 
     }
 
+    
+
     return (
         <div className="chatCard">
             <button className="chatCard-image" onClick={imageClickedHandler}>

@@ -19,12 +19,14 @@ export const AuthProvider = ({ children }) => {
 
     const me = data?.user ?? undefined
 
-    const publicKeyMutation = usePublicKeyMutation();
+    // const publicKeyMutation = usePublicKeyMutation();
 
     const logoutMutation = useMutation({
         mutationFn: logoutUser,
         onSuccess: () => {
             queryClient.invalidateQueries(["me"])
+            localStorage.clear()
+            navigate("/auth")
         }
     })
 
@@ -34,9 +36,6 @@ export const AuthProvider = ({ children }) => {
     }
     const logout = () => {
         logoutMutation.mutate()
-        queryClient.invalidateQueries(["me"])
-        navigate("/auth")
-
     }
 
     return (

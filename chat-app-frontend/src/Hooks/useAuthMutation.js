@@ -6,13 +6,25 @@ import {
   verifyUser,
 } from "../Services/authAPI";
 import { useAuth } from "../Context/AuthContext";
+import { decryptPrivateKey } from "./usePrivateKeyEncryption";
 
-export const getLoginMutation = () => {
+export const getLoginMutation = ({ password, setPassword }) => {
   const { login } = useAuth();
 
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      const user = data.data.data;
+      const privateKey = await decryptPrivateKey(
+        user.encryptedPrivateKey,
+        password,
+        user.salt,
+        user.iv,
+      );
+
+      // store locally
+      localStorage.setItem("privateKey", privateKey);
+      setPassword("");
       login();
     },
   });

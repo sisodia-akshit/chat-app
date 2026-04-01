@@ -43,7 +43,9 @@ exports.getPreviousChats = asyncErrorHandler(async (req, res, next) => {
 
   const chats = await Chat.find({
     _id: { $in: sender?.previousChats },
-  }).populate("members", "name email photo publicKey");
+  })
+    .populate("members", "name email photo publicKey")
+    // .populate("lastMessage.sender", "name email photo publicKey");
 
   if (!chats) {
     return next(new CustomError("No prev chats!", 404));

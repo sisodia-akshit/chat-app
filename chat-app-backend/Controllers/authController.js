@@ -9,10 +9,11 @@ const asyncErrorHandler = require("../Utils/asyncErrorHandler");
 const mongoose = require("mongoose");
 const VerifiedUser = require("../Models/VerifiedUser");
 
-const sendResponse = async (id, res, statusCode) => {
-  const token = await sendAccessToken(id);
+const sendResponse = async (user, res, statusCode) => {
+  const token = await sendAccessToken(user._id);
   res.cookie("token", token, cookieOptions);
-  res.status(statusCode).json({ status: "success" });
+  user.password = undefined;
+  res.status(statusCode).json({ status: "success", data: user });
 };
 
 exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
@@ -111,8 +112,18 @@ exports.register = asyncErrorHandler(async (req, res, next) => {
   const userId = req?.body?.userId;
   const password = req?.body?.password;
   const publicKey = req?.body?.publicKey;
+  const encryptedPrivateKey = req?.body?.encryptedPrivateKey;
+  const salt = req?.body?.salt;
+  const iv = req?.body?.iv;
 
-  if (!userId || !password || !publicKey) {
+  if (
+    !userId ||
+    !password ||
+    !publicKey ||
+    !encryptedPrivateKey ||
+    !salt ||
+    !iv
+  ) {
     return next(new CustomError("All credentials required!", 400));
   }
 
@@ -131,9 +142,12 @@ exports.register = asyncErrorHandler(async (req, res, next) => {
     email: verifiedUser.email,
     password,
     publicKey,
+    encryptedPrivateKey,
+    salt,
+    iv,
   });
 
-  sendResponse(user._id, res, 201);
+  sendResponse(user, res, 201);
 });
 
 exports.login = asyncErrorHandler(async (req, res, next) => {
@@ -148,7 +162,7 @@ exports.login = asyncErrorHandler(async (req, res, next) => {
   if (!(await user.isPasswordCorrect(password)))
     return next(new CustomError("Invalid credentials!", 400));
 
-  sendResponse(user._id, res, 200);
+  sendResponse(user, res, 200);
 });
 
 exports.logout = asyncErrorHandler(async (req, res) => {

@@ -5,6 +5,7 @@ import '../../Styles/Auth.css'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import { useRef, useState } from 'react'
 import { getOtpMutation, getRegisterMutation, getVerifyMutation } from '../../Hooks/useAuthMutation'
+import { encryptPrivateKey } from "../../Hooks/usePrivateKeyEncryption";
 
 function Register({ isNext, setNext, isContinue, setContinue, }) {
   const [message, setMessage] = useState("")
@@ -55,7 +56,7 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
     }
   };
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     if (password !== conPassword) {
@@ -69,13 +70,18 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
     const publicKey = util.encodeBase64(keyPair.publicKey);
     const privateKey = util.encodeBase64(keyPair.secretKey);
 
+    const encryptedData = await encryptPrivateKey(privateKey, password);
+
     // store privateKey
     localStorage.setItem("privateKey", privateKey);
 
     useRegisterMutation.mutate({
       userId: localStorage.getItem("userId"),
       password,
-      publicKey
+      publicKey,
+      encryptedPrivateKey: encryptedData.encryptedPrivateKey,
+      salt: encryptedData.salt,
+      iv: encryptedData.iv
     })
   }
 

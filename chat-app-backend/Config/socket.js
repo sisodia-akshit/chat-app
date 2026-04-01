@@ -108,7 +108,9 @@ const initSocket = (server) => {
             },
           },
           { returnDocument: "after" },
-        ).populate("members", "name email photo publicKey");
+        )
+          .populate("members", "name email photo publicKey")
+          // .populate("lastMessage.sender", "name email photo publicKey");
 
         getIO().to(chatId).emit("newMessage", message);
         getIO().to([receiverId, senderId]).emit("updateChat", updatedChat);

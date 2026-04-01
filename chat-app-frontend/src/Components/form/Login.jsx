@@ -6,11 +6,11 @@ function Login() {
   const [password, setPassword] = useState('')
   const [open, setOpen] = useState(false)
 
-  const useLoginMutation = getLoginMutation();
+  const useLoginMutation = getLoginMutation({ password, setPassword });
 
   if (useLoginMutation?.error) console.log(useLoginMutation?.failureReason?.response?.data?.message)
 
- 
+
 
 
   const onSubmitHandler = (e) => {
@@ -20,7 +20,6 @@ function Login() {
       password
     })
     setEmail("")
-    setPassword("")
   }
 
   return (

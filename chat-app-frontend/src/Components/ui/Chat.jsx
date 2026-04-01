@@ -1,5 +1,4 @@
 import "../../Styles/Chat.css"
-import { FaEllipsisV } from "react-icons/fa";
 
 import UserCard from "../cards/UserCard";
 import ButtonGoBack from "../common/ButtonGoBack";
@@ -7,10 +6,8 @@ import Messages from "./Messages";
 import SendMessageForm from "../form/SendMessageForm";
 import { useEffect, useRef, useState } from "react";
 import { getPrivateMessage } from "../../Services/MessageAPI";
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import socket from "../../Lib/socket";
-import ProfileUserDetails from "../common/ProfileUserDetails";
-import { getUserById } from "../../Services/userAPI";
 
 function Chat({ id, receiver, chatId }) {
     const queryClient = useQueryClient();

@@ -139,10 +139,14 @@ function SendMessageForm({ id, receiver, chatId, content, setContent }) {
         if (!content && !files) return
 
         if (files) {
-            uploadMutation.mutate({ id: chatId, files })
+            uploadMutation.mutate({
+                id: chatId,
+                files
+            })
         } else {
             const receiverPublicKey = receiver?.publicKey;
             const { encrypted, nonce } = encryptMessage(content, localStorage.getItem("privateKey"), receiverPublicKey);
+            
             socket.emit("sendMessage", {
                 chatId,
                 receiverId: id,
@@ -153,7 +157,7 @@ function SendMessageForm({ id, receiver, chatId, content, setContent }) {
 
             setContent("")
         }
-        document.getElementById("preview").innerHTML = ""
+        document.getElementById("preview").innerHTML = "";
     }
 
     const handleKeyDown = (e) => {

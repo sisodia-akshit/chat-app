@@ -1,11 +1,11 @@
 import { FaArrowRight } from "react-icons/fa"
 import ChatCard from "../cards/ChatCard"
-import UserCard from "../cards/UserCard"
 import ButtonFirstMessage from "./ButtonFirstMessage"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
+import Loading from "../ui/Loading";
 
-function UsersList({ data, chatCard, activeId }) {
+function UsersList({ data, isLoading, chatCard, activeId }) {
     const { me } = useAuth();
 
     const navigate = useNavigate();
@@ -17,6 +17,7 @@ function UsersList({ data, chatCard, activeId }) {
     }
 
 
+    if (isLoading) return <Loading />
     return (
         <>
             {data?.length > 0 && data?.map(curr => {

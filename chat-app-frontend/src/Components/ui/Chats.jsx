@@ -2,18 +2,20 @@ import "../../Styles/Chats.css"
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { getPrevChatUsers } from '../../Services/userAPI'
-
 import UsersList from '../common/UsersList'
 import NoChat from './NoChat'
 import Loading from './Loading'
 import { getPrevChats } from "../../Services/chatsApi"
 import { useEffect } from "react"
 import socket from "../../Lib/socket"
+import { useParams } from "react-router-dom"
 
 
 function Chats({ activeId, receiver }) {
     const queryClient = useQueryClient();
+    const pathname = useParams();
+
+
     const { data, isLoading, error } = useQuery({
         queryKey: ["previousChatUsers"],
         queryFn: getPrevChats,
@@ -32,6 +34,7 @@ function Chats({ activeId, receiver }) {
                     data: [chat, ...filtered]
                 };
             })
+            
         }
         socket.on("updateChat", handler)
         return () => socket.off("newMessage", handler)

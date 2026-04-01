@@ -43,6 +43,9 @@ exports.registerSchema = z.object({
         })
         .min(1, "All credentials required")
         .min(6, "Password length must be of 6 digits."),
+      encryptedPrivateKey: z.string(),
+      salt: z.string(),
+      iv: z.string(),
     })
     .strict(),
 });
