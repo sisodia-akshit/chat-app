@@ -19,11 +19,7 @@ const sendResponse = async (user, res, statusCode) => {
 exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
   const name = req?.body?.name;
   const email = req?.body?.email.toLowerCase();
-  // const password = req?.body?.password;
 
-  // if (!name || !email || !password) {
-  //   return next(new CustomError("All credentials required!", 400));
-  // }
   if (!name || !email) {
     return next(new CustomError("All credentials required!", 400));
   }

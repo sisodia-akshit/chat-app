@@ -95,7 +95,7 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
 
           <label htmlFor="email">Email<span>*</span></label>
           <input name='email' type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="auth-email-input" placeholder='Enter your email address' required />
-          <p className='formError'>{useRegisterMutation?.failureReason?.response?.data?.message}</p>
+          <p className='formError'>{useOtpMutation?.failureReason?.response?.data?.message}</p>
           <button type='submit' className="auth-login-button">Next<FaArrowRight /></button>
         </form>
 
