@@ -7,13 +7,13 @@ import NoChat from './NoChat'
 import Loading from './Loading'
 import { getPrevChats } from "../../Services/chatsApi"
 import { useEffect } from "react"
-import socket from "../../Lib/socket"
+import { getSocket } from "../../Lib/socket"
 import { useParams } from "react-router-dom"
 
 
 function Chats({ activeId, receiver }) {
     const queryClient = useQueryClient();
-    const pathname = useParams();
+    const socket = getSocket();
 
 
     const { data, isLoading, error } = useQuery({
@@ -36,7 +36,7 @@ function Chats({ activeId, receiver }) {
             })
             
         }
-        socket.on("updateChat", handler)
+        socket?.on("updateChat", handler)
         return () => socket.off("newMessage", handler)
     }, [queryClient])
 

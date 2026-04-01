@@ -45,12 +45,12 @@ const initSocket = (server) => {
 
   io.on("connection", (socket) => {
     socket.join(socket?.user?._id.toString());
-    console.log(`${socket?.user?.name} Connected`);
+    console.log(`${socket?.user?.name} Connected`, socket.id);
 
     socket.on("joinChat", async (chatId) => {
       socket.join(chatId);
       socket.to(chatId).emit("updateSeen", "message seen");
-      console.log(`${socket.user.name} joins ${chatId}`);
+      // console.log(`${socket.user.name} joins ${chatId}`);
     });
 
     socket.on("sendMessage", async (data) => {
@@ -61,7 +61,7 @@ const initSocket = (server) => {
         const nonce = data?.nonce;
         const senderId = data?.senderId;
 
-        const sender = socket?.user;
+        // const sender = socket?.user;
 
         if (!mongoose.Types.ObjectId.isValid(chatId)) {
           return socket.emit("error", "Invalid chatId");
@@ -75,7 +75,7 @@ const initSocket = (server) => {
           return socket.emit("error", "Chat not found");
         }
 
-        const receiver = await User.findById(receiverId);
+        // const receiver = await User.findById(receiverId);
 
         // add Message to db
         const message = await PrivateMessage.create({
@@ -87,14 +87,14 @@ const initSocket = (server) => {
         });
 
         // add new chat in prevChats list
-        if (!sender.previousChats.includes(chatId)) {
-          sender.previousChats.unshift(chatId);
-          await sender.save();
-        }
-        if (!receiver.previousChats.includes(chatId)) {
-          receiver.previousChats?.unshift(chatId);
-          await receiver.save();
-        }
+        // if (!sender.previousChats.includes(chatId)) {
+        //   sender.previousChats.unshift(chatId);
+        //   await sender.save();
+        // }
+        // if (!receiver.previousChats.includes(chatId)) {
+        //   receiver.previousChats?.unshift(chatId);
+        //   await receiver.save();
+        // }
 
         //  update lastMessage in db
         const updatedChat = await Chat.findByIdAndUpdate(
@@ -108,9 +108,8 @@ const initSocket = (server) => {
             },
           },
           { returnDocument: "after" },
-        )
-          .populate("members", "name email photo publicKey")
-          // .populate("lastMessage.sender", "name email photo publicKey");
+        ).populate("members", "name email photo publicKey");
+        // .populate("lastMessage.sender", "name email photo publicKey");
 
         getIO().to(chatId).emit("newMessage", message);
         getIO().to([receiverId, senderId]).emit("updateChat", updatedChat);
@@ -144,10 +143,6 @@ const initSocket = (server) => {
         console.log(error);
         socket.emit("error", "Something went wrong");
       }
-    });
-
-    socket.on("leaveChat", (message) => {
-      console.log(`leaveChat ${message}`);
     });
 
     socket.on("disconnect", () => {

@@ -6,11 +6,12 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getOrCreateChat } from '../Services/chatsApi'
 import Loading from '../Components/ui/Loading'
-import socket from '../Lib/socket'
+import { getSocket } from '../Lib/socket'
 import { getUserById } from '../Services/userAPI'
 
 function PrivateMessages() {
   const { id } = useParams();
+  const socket = getSocket();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["chat", id],
@@ -36,7 +37,7 @@ function PrivateMessages() {
     socket.on("connect", join);
 
     return () => {
-      socket.emit("leaveChat", chat._id);
+      // socket.emit("leaveChat", chat._id);
       socket.off("connect", join);
     };
 

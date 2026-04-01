@@ -7,11 +7,12 @@ import SendMessageForm from "../form/SendMessageForm";
 import { useEffect, useRef, useState } from "react";
 import { getPrivateMessage } from "../../Services/MessageAPI";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import socket from "../../Lib/socket";
+import { getSocket } from "../../Lib/socket";
 import ProfileUserDetails from "../common/ProfileUserDetails";
 
 function Chat({ id, receiver, chatId }) {
     const queryClient = useQueryClient();
+    const socket = getSocket();
 
     const [content, setContent] = useState("")
     const [scroll, setScroll] = useState(true);
@@ -85,7 +86,7 @@ function Chat({ id, receiver, chatId }) {
             })
 
         }
-        socket.on("newMessage", handler)
+        socket?.on("newMessage", handler)
 
         return () => socket.off("newMessage", handler)
     }, [queryClient, id])
@@ -116,7 +117,7 @@ function Chat({ id, receiver, chatId }) {
             })
 
         }
-        socket.on("updateSeen", handler)
+        socket?.on("updateSeen", handler)
 
         return () => socket.off("updateSeen", handler)
     }, [queryClient, id])
@@ -136,8 +137,8 @@ function Chat({ id, receiver, chatId }) {
             <div ref={chatRef} className="chat-main" onScroll={messageScrollHandler}>
                 <Messages receiver={receiver} id={id} content={content} messages={messages} />
                 {isFetchingNextPage || !scroll && <div className="loader"></div>}
-                <br />
-                {messages.length < 20 && <ProfileUserDetails user={receiver} />}
+                {/* <br /> */}
+                {/* {messages.length < 20 && <ProfileUserDetails user={receiver} />} */}
             </div>
 
             {/* input  */}

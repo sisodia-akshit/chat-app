@@ -63,8 +63,7 @@ export default function AudioRecorder() {
         body: formData,
       });
 
-      const data = await res.json();
-      console.log(data);
+      await res.json();
     } catch (error) {
       console.error("Upload error:", error);
     }

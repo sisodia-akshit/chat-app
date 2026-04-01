@@ -5,7 +5,7 @@ import "../../Styles/Form.css"
 import { useEffect, useRef, useState } from "react";
 import { FaArrowRight, FaImage, FaMicrophone, FaPaperclip, FaPause, FaPlus, FaVideo } from "react-icons/fa";
 import { useUploadMutation } from "../../Hooks/useMutation";
-import socket from "../../Lib/socket";
+import { getSocket } from "../../Lib/socket";
 import { decryptMessage, encryptMessage } from "../../Hooks/useEncryptMessage";
 import { useAuth } from "../../Context/AuthContext";
 
@@ -13,6 +13,7 @@ import { useAuth } from "../../Context/AuthContext";
 
 function SendMessageForm({ id, receiver, chatId, content, setContent }) {
     const { me } = useAuth();
+    const socket = getSocket()
     const [openFiles, setOpenFiles] = useState(false);
     const [files, setFiles] = useState(null);
     const [startRecord, setStartRecord] = useState(false);
@@ -222,6 +223,7 @@ function SendMessageForm({ id, receiver, chatId, content, setContent }) {
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
+
         if (!content && !files) return
 
         if (files) {
@@ -230,16 +232,19 @@ function SendMessageForm({ id, receiver, chatId, content, setContent }) {
                 files
             })
         } else {
+
             const receiverPublicKey = receiver?.publicKey;
             const { encrypted, nonce } = encryptMessage(content, localStorage.getItem("privateKey"), receiverPublicKey);
 
-            socket.emit("sendMessage", {
+            const data = {
                 chatId,
                 receiverId: id,
                 senderId: me?._id,
                 content: encrypted,
                 nonce,
-            })
+            }
+
+            socket.emit("sendMessage", data)
 
             setContent("")
         }

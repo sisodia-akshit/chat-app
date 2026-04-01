@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { getMe } from '../Services/userAPI'
 import { useNavigate } from 'react-router-dom'
 import { logoutUser } from '../Services/authAPI'
 import { usePublicKeyMutation } from "../Hooks/useMutation";
+import { connectSocket } from '../Lib/socket'
 
 const AuthContext = createContext()
 
@@ -14,12 +15,14 @@ export const AuthProvider = ({ children }) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ["me"],
         queryFn: getMe,
-        retry: false,
     })
 
     const me = data?.user ?? undefined
 
-    // const publicKeyMutation = usePublicKeyMutation();
+    useEffect(() => {
+        connectSocket();
+    }, [me])
+
 
     const logoutMutation = useMutation({
         mutationFn: logoutUser,

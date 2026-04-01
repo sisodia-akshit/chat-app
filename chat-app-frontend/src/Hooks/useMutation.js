@@ -16,9 +16,7 @@ export const useUploadMutation = ({ setFiles }) => {
 export const useAudioMutation = () => {
   return useMutation({
     mutationFn: uploadFiles,
-    onSuccess: (data) => {
-      console.log(data);
-    },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error?.response);
     },
@@ -28,9 +26,7 @@ export const useAudioMutation = () => {
 export const usePublicKeyMutation = () => {
   return useMutation({
     mutationFn: setPublicKey,
-    onSuccess: (data) => {
-      console.log(data);
-    },
+    onSuccess: (data) => {},
     onError: (error) => {
       console.log(error?.response);
     },
