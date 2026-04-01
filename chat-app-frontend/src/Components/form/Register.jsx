@@ -25,7 +25,7 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
 
   const useOtpMutation = getOtpMutation({ setNext, setEmail, setName });
   const useVerifyMutation = getVerifyMutation({ setContinue, setMessage });
-  const useRegisterMutation = getRegisterMutation({ password, setPassword, setConPassword });
+  const useRegisterMutation = getRegisterMutation({ setPassword, setConPassword });
 
 
   const nextClickedHandler = (e) => {
@@ -72,6 +72,9 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
     const privateKey = util.encodeBase64(keyPair.secretKey);
 
     const encryptedData = await encryptPrivateKey(privateKey, password);
+
+    // store privateKey
+    localStorage.setItem("privateKey", privateKey);
 
     useRegisterMutation.mutate({
       userId: localStorage.getItem("userId"),
