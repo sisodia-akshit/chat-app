@@ -6,7 +6,6 @@ export const useUploadMutation = ({ setFiles }) => {
   return useMutation({
     mutationFn: uploadFiles,
     onSuccess: (data) => {
-      console.log(data);
       setFiles(null);
     },
     onError: (error) => {

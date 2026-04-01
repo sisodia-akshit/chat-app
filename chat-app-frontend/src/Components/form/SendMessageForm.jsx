@@ -1,12 +1,12 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import nacl from "tweetnacl";
+import * as util from "tweetnacl-util";
+
 import "../../Styles/Form.css"
 import { useEffect, useRef, useState } from "react";
-import { sendPrivateMessage } from "../../Services/MessageAPI";
 import { FaArrowRight, FaImage, FaMicrophone, FaPaperclip, FaPause, FaPlus, FaVideo } from "react-icons/fa";
 import { useUploadMutation } from "../../Hooks/useMutation";
 import socket from "../../Lib/socket";
 import { decryptMessage, encryptMessage } from "../../Hooks/useEncryptMessage";
-import { getUserById } from "../../Services/userAPI";
 import { useAuth } from "../../Context/AuthContext";
 
 
@@ -79,30 +79,116 @@ function SendMessageForm({ id, receiver, chatId, content, setContent }) {
         if (isRecording) stopRecording();
 
         const formData = new FormData();
-        formData.append("files", audioFile);
+        const buffer = await audioFile.arrayBuffer();
+
+        // AES key + IV
+        const aesKey = crypto.getRandomValues(new Uint8Array(32));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+
+        // Encrypt file (AES)
+        const cryptoKey = await crypto.subtle.importKey(
+            "raw",
+            aesKey,
+            "AES-GCM",
+            false,
+            ["encrypt"]
+        );
+
+        const encryptedBuffer = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv },
+            cryptoKey,
+            buffer
+        );
+
+        // Convert to blob
+        const encryptedBlob = new Blob([encryptedBuffer]);
+
+        // Encrypt AES key (NaCl)
+        const nonce = nacl.randomBytes(nacl.box.nonceLength);
+        const receiverPublicKey = receiver?.publicKey;
+        const senderPrivateKey = localStorage.getItem("privateKey");
+
+        const encryptedKey = nacl.box(
+            aesKey,
+            nonce,
+            util.decodeBase64(receiverPublicKey),
+            util.decodeBase64(senderPrivateKey)
+        );
+
+        formData.append("files", encryptedBlob);
+        formData.append("keys", util.encodeBase64(encryptedKey));
+        formData.append("nonces", util.encodeBase64(nonce));
+        formData.append("ivs", btoa(String.fromCharCode(...iv)));
+        formData.append("types", audioFile.type);
+        formData.append("names", audioFile.name);
 
         uploadMutation.mutate({ id: chatId, files: formData });
         setAudioUrl("")
         setStartRecord(false)
     };
 
-    //!recording Logic
+    //!recording Logic ends
 
     const onContentChangeHandler = (e) => {
         setContent(e.target.value);
 
     }
 
-    const fileInputHandler = (e) => {
+    const fileInputHandler = async (e) => {
         const files = e.target.files;
         const formData = new FormData();
 
-        for (let i = 0; i < files.length; i++) {
-            formData.append("files", files[i]); // same key "file"
-        }
-        // formData.append("content", content)
-        setFiles(formData)
+        // for (let i = 0; i < files.length; i++) {
+        //     formData.append("files", files[i]); // same key "file"
+        // }
 
+        for (let file of files) {
+            const buffer = await file.arrayBuffer();
+
+            // AES key + IV
+            const aesKey = crypto.getRandomValues(new Uint8Array(32));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+
+            // Encrypt file (AES)
+            const cryptoKey = await crypto.subtle.importKey(
+                "raw",
+                aesKey,
+                "AES-GCM",
+                false,
+                ["encrypt"]
+            );
+
+            const encryptedBuffer = await crypto.subtle.encrypt(
+                { name: "AES-GCM", iv },
+                cryptoKey,
+                buffer
+            );
+
+            // Convert to blob
+            const encryptedBlob = new Blob([encryptedBuffer]);
+
+            // Encrypt AES key (NaCl)
+            const nonce = nacl.randomBytes(nacl.box.nonceLength);
+            const receiverPublicKey = receiver?.publicKey;
+            const senderPrivateKey = localStorage.getItem("privateKey");
+
+            const encryptedKey = nacl.box(
+                aesKey,
+                nonce,
+                util.decodeBase64(receiverPublicKey),
+                util.decodeBase64(senderPrivateKey)
+            );
+
+            // Append encrypted data
+            formData.append("files", encryptedBlob);
+            formData.append("keys", util.encodeBase64(encryptedKey));
+            formData.append("nonces", util.encodeBase64(nonce));
+            formData.append("ivs", btoa(String.fromCharCode(...iv)));
+            formData.append("types", file.type);
+            formData.append("names", file.name);
+        }
+
+        setFiles(formData)
 
         // preview files logic
         const preview = document.getElementById("preview");
@@ -146,7 +232,7 @@ function SendMessageForm({ id, receiver, chatId, content, setContent }) {
         } else {
             const receiverPublicKey = receiver?.publicKey;
             const { encrypted, nonce } = encryptMessage(content, localStorage.getItem("privateKey"), receiverPublicKey);
-            
+
             socket.emit("sendMessage", {
                 chatId,
                 receiverId: id,

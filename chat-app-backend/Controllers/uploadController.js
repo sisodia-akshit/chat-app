@@ -53,8 +53,22 @@ exports.multiUploadHandler = asyncErrorHandler(async (req, res, next) => {
   const chatId = req.params.id;
   const sender = req.user;
 
+  const keys = Array.isArray(req.body.keys) ? req.body.keys : [req.body.keys];
+  const nonces = Array.isArray(req.body.nonces)
+    ? req.body.nonces
+    : [req.body.nonces];
+
+  const ivs = Array.isArray(req.body.ivs) ? req.body.ivs : [req.body.ivs];
+  const types = Array.isArray(req.body.types)
+    ? req.body.types
+    : [req.body.types];
+
+  const names = Array.isArray(req.body.names)
+    ? req.body.names
+    : [req.body.names];
+
   const files = req.files;
-  console.log(files, content);
+  // console.log(files, content);
   const results = [];
 
   if (!mongoose.Types.ObjectId.isValid(chatId)) {
@@ -66,9 +80,13 @@ exports.multiUploadHandler = asyncErrorHandler(async (req, res, next) => {
     return next(new CustomError("No chat found!!", 404));
   }
 
-  const receiver = chat?.members.find((curr) => curr._id.toString() !== sender);
+  const receiver = chat?.members.find(
+    (curr) => curr._id.toString() !== sender._id.toString(),
+  );
 
-  for (const file of files) {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
     let resourceType = getResourceType(file.mimetype);
 
     const result = await cloudinary.uploader.upload(file.path, {
@@ -77,11 +95,16 @@ exports.multiUploadHandler = asyncErrorHandler(async (req, res, next) => {
     });
 
     results.push({
-      name: file.originalname,
-      type: file.mimetype,
+      name: names[i],
+      type: types[i],
       url: result.secure_url,
+      encryptedKey: keys[i],
+      iv: ivs[i],
+      nonce: nonces[i],
     });
   }
+
+  console.log(req?.body);
 
   const data = {
     chatId,
@@ -102,25 +125,3 @@ exports.multiUploadHandler = asyncErrorHandler(async (req, res, next) => {
     message: "Data sent successfully",
   });
 });
-
-// exports.multiUploadHandler = asyncErrorHandler(async (req, res, next) => {
-//   const files = req.files;
-//   const results = [];
-
-//   for (const file of files) {
-//     let resourceType = getResourceType(file.mimetype);
-
-//     const result = await cloudinary.uploader.upload(file.path, {
-//       resource_type: resourceType,
-//       timeout: 60000,
-//     });
-
-//     results.push({
-//       name: file.originalname,
-//       type: file.mimetype,
-//       url: result.secure_url,
-//     });
-//   }
-
-//   res.status(200).json({ status: "success", data: results });
-// });

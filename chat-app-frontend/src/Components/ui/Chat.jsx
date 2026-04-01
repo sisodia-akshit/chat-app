@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { getPrivateMessage } from "../../Services/MessageAPI";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import socket from "../../Lib/socket";
+import ProfileUserDetails from "../common/ProfileUserDetails";
 
 function Chat({ id, receiver, chatId }) {
     const queryClient = useQueryClient();
@@ -135,7 +136,8 @@ function Chat({ id, receiver, chatId }) {
             <div ref={chatRef} className="chat-main" onScroll={messageScrollHandler}>
                 <Messages receiver={receiver} id={id} content={content} messages={messages} />
                 {isFetchingNextPage || !scroll && <div className="loader"></div>}
-                {/* {!scroll && <ProfileUserDetails user={user} />} */}
+                <br />
+                {messages.length < 20 && <ProfileUserDetails user={receiver} />}
             </div>
 
             {/* input  */}
