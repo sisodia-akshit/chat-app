@@ -93,6 +93,7 @@ exports.verifyOtp = asyncErrorHandler(async (req, res, next) => {
   const verifiedUser = await VerifiedUser.create({
     name: record.name,
     email: record.email,
+    expiresAt: Date.now() + 2 * 60 * 1000,
   });
 
   await Otp.findByIdAndDelete(otpId);

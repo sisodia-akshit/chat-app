@@ -6,6 +6,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import { useRef, useState } from 'react'
 import { getOtpMutation, getRegisterMutation, getVerifyMutation } from '../../Hooks/useAuthMutation'
 import { encryptPrivateKey } from "../../Hooks/usePrivateKeyEncryption";
+import Loading from "../ui/Loading";
 
 function Register({ isNext, setNext, isContinue, setContinue, }) {
   const [message, setMessage] = useState("")
@@ -96,7 +97,7 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
           <label htmlFor="email">Email<span>*</span></label>
           <input name='email' type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="auth-email-input" placeholder='Enter your email address' required />
           <p className='formError'>{useOtpMutation?.failureReason?.response?.data?.message}</p>
-          <button type='submit' className="auth-login-button">Next<FaArrowRight /></button>
+          <button type='submit' className="auth-login-button">{useOtpMutation.isPending ? <Loading /> : "Next"}<FaArrowRight /></button>
         </form>
 
       }
@@ -117,7 +118,7 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
 
           <p className="auth-sub-greetings">OTP is valid for two minutes.</p>
 
-          <button type='submit' className="auth-login-button" >Verify<FaArrowRight /></button>
+          <button type='submit' className="auth-login-button" >{useVerifyMutation.isPending ? "Verifying..." : "Verify"}<FaArrowRight /></button>
         </form>
       </>}
 
@@ -137,7 +138,7 @@ function Register({ isNext, setNext, isContinue, setContinue, }) {
           <p className='formError'>{useRegisterMutation?.failureReason?.response?.data?.message}</p>
 
           <div className="flex">
-            <button type='submit' className="auth-login-button">Continue<FaArrowRight /></button>
+            <button type='submit' className="auth-login-button">{useRegisterMutation.isPending ? "Continue..." : "Continue"}<FaArrowRight /></button>
           </div>
         </form>
       </>}
