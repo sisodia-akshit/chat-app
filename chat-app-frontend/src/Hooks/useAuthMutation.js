@@ -54,12 +54,26 @@ export const getVerifyMutation = ({ setContinue, setMessage }) => {
   });
 };
 
-export const getRegisterMutation = ({ setPassword, setConPassword }) => {
+export const getRegisterMutation = ({
+  password,
+  setPassword,
+  setConPassword,
+}) => {
   const { login } = useAuth();
   return useMutation({
     mutationFn: registerUser,
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      const user = data.data.data;
       localStorage.removeItem("userId");
+      const privateKey = await decryptPrivateKey(
+        user.encryptedPrivateKey,
+        password,
+        user.salt,
+        user.iv,
+      );
+
+      // store locally
+      localStorage.setItem("privateKey", privateKey);
       setPassword("");
       setConPassword("");
       login();
