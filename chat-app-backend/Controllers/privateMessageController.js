@@ -59,7 +59,10 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
     return next(new CustomError("Invalid receiver Id!", 400));
   }
 
-  const chat = await Chat.findById(chatId);
+  const chat = await Chat.findById(chatId).populate(
+    "members",
+    "name email photo publicKey",
+  );
 
   if (!chat) {
     return next(new CustomError("Chat not found!", 404));
@@ -88,7 +91,9 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
   // last message update
   if (!(chat.lastMessage.sender.toString() === sender)) {
     chat.unreads = 0;
-    await chat.save();
+    chat.seen = true;
+    const updatedChat = await chat.save();
+    getIO().to(receiver._id.toString()).emit("updateChat", updatedChat);
   }
 
   const data = await PrivateMessage.find(query)
@@ -101,7 +106,6 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
   getIO().to(chatId).emit("updateSeen", {
     by: sender,
   });
-  // getIO().to([receiver._id.toString(), sender]).emit("updateChat", updatedChat);
 
   res.status(200).json({
     status: "success",

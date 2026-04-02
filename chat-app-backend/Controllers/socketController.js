@@ -73,6 +73,7 @@ exports.sendMessageHandler = (socket, io) => async (data) => {
           sender: message.sender,
           createdAt: message.createdAt,
         },
+        seen: false,
       },
       { returnDocument: "after" },
     ).populate("members", "name email photo publicKey");

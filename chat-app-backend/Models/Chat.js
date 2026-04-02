@@ -24,6 +24,10 @@ const chatSchema = mongoose.Schema(
       },
       default: null,
     },
+    seen: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
