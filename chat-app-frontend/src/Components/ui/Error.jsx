@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import "../../Styles/Ui.css"
 
 function Error({ error }) {
@@ -13,8 +13,7 @@ function Error({ error }) {
         )
     }
     if (error.status === 401) {
-        navigate("/auth")
-        return
+        return <Navigate to="/auth" replace />;
     }
 
     return (

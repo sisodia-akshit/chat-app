@@ -89,7 +89,7 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
   );
 
   // last message update
-  if (!(chat.lastMessage.sender.toString() === sender)) {
+  if (!(chat?.lastMessage?.sender?.toString() === sender)) {
     chat.unreads = 0;
     chat.seen = true;
     const updatedChat = await chat.save();

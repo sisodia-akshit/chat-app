@@ -28,6 +28,7 @@ exports.sendMessageHandler = (socket, io) => async (data) => {
       return socket.emit("error", "User not found!");
     }
 
+
     if (!mongoose.Types.ObjectId.isValid(chatId)) {
       return socket.emit("error", "Invalid chatId");
     }
@@ -62,6 +63,7 @@ exports.sendMessageHandler = (socket, io) => async (data) => {
       seen: false,
     });
 
+
     //  update lastMessage in db
     const updatedChat = await Chat.findByIdAndUpdate(
       chatId,
@@ -78,6 +80,7 @@ exports.sendMessageHandler = (socket, io) => async (data) => {
       { returnDocument: "after" },
     ).populate("members", "name email photo publicKey");
     // .populate("lastMessage.sender", "name email photo publicKey");
+
 
     io.to(chatId).emit("newMessage", message);
     io.to([receiverId, senderId]).emit("updateChat", updatedChat);

@@ -20,8 +20,8 @@ function ChatCard({ data }) {
     const imageClickedHandler = () => {
         navigate(`/users/${receiver._id}`)
     }
-    const cardClickedHandler = () => {
-        queryClient.invalidateQueries(["user"])
+    const cardClickedHandler = async () => {
+        await queryClient.invalidateQueries(["user"])
         navigate(`/${receiver._id}`)
 
     }
@@ -40,7 +40,7 @@ function ChatCard({ data }) {
             <div className="chatCard-detail">
                 <p className="chatCard-detail-time">{time}</p>
                 {data?.lastMessage?.sender != me._id && data.unreads > 0 && <p className="chatCard-detail-unreads">{data.unreads}</p>}
-                {data?.lastMessage?.sender == me._id && data?.seen === false && <p className="chatCard-detail-seen"><FaCheck color="#ccc"/></p>}
+                {data?.lastMessage?.sender == me._id && data?.seen === false && <p className="chatCard-detail-seen"><FaCheck color="#ccc" /></p>}
                 {data?.lastMessage?.sender == me._id && data?.seen === true && <p className="chatCard-detail-seen"><FaCheckDouble color="#00d0ff" /></p>}
             </div>
 

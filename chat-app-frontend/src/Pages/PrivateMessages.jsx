@@ -37,7 +37,6 @@ function PrivateMessages() {
     socket.on("connect", join);
 
     return () => {
-      // socket.emit("leaveChat", chat._id);
       socket.off("connect", join);
     };
 
