@@ -1,10 +1,10 @@
 .sidebar {
   box-sizing: border-box;
-  background-color: #000;
+  background-color: #111;
   color: #fff;
   width: 260px;
   height: 100vh;
-  padding: 1rem;
+  padding: 1rem 1.2rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -15,6 +15,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 1rem;
 
   & .aside-name{
     color: #fff;
@@ -39,7 +40,6 @@
 }
 
 .nav-link-search {
-  background-color: #000;
   border: 1px solid #ccc;
 }
 .nav-link-search:active {
@@ -61,22 +61,23 @@
     color: #ccc;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
   }
 
   & span {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #ccc;
   }
   & .aside-icon {
     color: #ccc;
+    font-size: 1.1rem;
   }
 }
 .nav-link:hover {
   background-color: #fff2;
 }
 .nav-link-active {
-  background-color: #ffffff2e;
+  background-color: #ffffff1a;
 
   & span {
     color: #fff;
@@ -91,7 +92,7 @@
 
 .sidebar-bottom {
   & p {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #ccc;
     margin-top: 10px;
   }
@@ -111,6 +112,14 @@
   padding: 0.5rem 1rem;
   align-items: center;
   height: 40px;
+}
+.header-heading{
+  display: flex;
+  gap: .5rem;
+
+  & .aside-name{
+    color: #fff;
+  }
 }
 .menu-bar {
   background-color: transparent;

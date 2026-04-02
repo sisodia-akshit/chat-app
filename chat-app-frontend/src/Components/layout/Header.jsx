@@ -11,8 +11,8 @@ function Header() {
       <button className="menu-bar" onClick={menuClickedHandler}>
         <FaBars color='#fff' />
       </button>
-      <h3 className="sidebar-heading">
-        <span className='sidebar-heading-logo'  />
+      <h3 className="header-heading">
+        <span className='sidebar-heading-logo' />
         <span className="aside-name">ChatApp</span>
       </h3>
 

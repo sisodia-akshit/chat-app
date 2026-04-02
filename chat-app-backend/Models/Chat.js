@@ -5,6 +5,10 @@ const chatSchema = mongoose.Schema(
     members: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     },
+    unreads: {
+      type: Number,
+      default: 0,
+    },
     lastMessage: {
       type: {
         content: String,

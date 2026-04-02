@@ -8,19 +8,21 @@ import Loading from './Loading'
 import { getPrevChats } from "../../Services/chatsApi"
 import { useEffect } from "react"
 import { getSocket } from "../../Lib/socket"
-import { useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { FaMagnifyingGlass } from "react-icons/fa6"
 
 
 function Chats({ activeId, receiver }) {
     const queryClient = useQueryClient();
     const socket = getSocket();
+    const navigate = useNavigate();
 
 
     const { data, isLoading, error } = useQuery({
         queryKey: ["previousChatUsers"],
         queryFn: getPrevChats,
     })
-    const users = data?.data ?? []
+    const chats = data?.data ?? []
 
     useEffect(() => {
         const handler = (chat) => {
@@ -34,27 +36,32 @@ function Chats({ activeId, receiver }) {
                     data: [chat, ...filtered]
                 };
             })
-            
+
         }
         socket?.on("updateChat", handler)
-        return () => socket.off("newMessage", handler)
+        return () => socket.off("updateChat", handler)
     }, [queryClient])
 
-    if (!isLoading && users.length === 0) return <div className="noUser-state"><NoChat /></div>
+    if (!isLoading && chats.length === 0) return <div className="noUser-state"><NoChat /></div>
     if (isLoading) return <Loading />
     return (
         <div className="chats">
-            <h2 className="chats-heading">Chats</h2>
+            <h2 className="chats-heading">Messages</h2>
 
-            {/* <div className="chats-buttons-container">
+            <div className="chats-buttons-container">
                 <div className="chats-buttons">
-                    <button type='button' className="chats-go-button chats-go-button-active">General</button>
+                    <button type='button' className="chats-go-button chats-go-button-active">General <span style={{ color: "#ccc" }}>{chats.length}</span></button>
                     <button type='button' className="chats-go-button">Archive</button>
                 </div>
-            </div> */}
+            </div>
+
+            <button type="button" className="chats-search-button" onClick={() => navigate('/users')}>
+                <p>Search...</p>
+                <FaMagnifyingGlass className="chats-search-magnifying" />
+            </button>
 
             <div className="chat-Cards">
-                <UsersList data={users} chatCard={true} activeId={activeId} />
+                <UsersList data={chats} chatCard={true} activeId={activeId} />
             </div>
         </div>
     )

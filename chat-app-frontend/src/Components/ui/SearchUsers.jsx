@@ -56,7 +56,6 @@ function SearchUsers() {
         <div className="search-users">
             <div className="search-users-main">
                 <h1 className="users-heading">Find Users</h1>
-
                 <Search search={search} setSearch={searchHandlers} />
             </div>
 

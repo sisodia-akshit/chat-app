@@ -4,9 +4,11 @@
   align-items: center;
   width: 100%;
   padding: 0 1rem;
+  border-radius: 10px;
+  color: inherit;
 }
 .chatCard:hover {
-  background-color: #eee;
+  background-color: #00000014;
 }
 
 .chatCard-image {
@@ -32,19 +34,21 @@
   width: 100%;
   height: 70px;
   box-sizing: border-box;
-  padding: 1rem 0;
+  padding: 1.1rem 0;
   padding-left: 0.6rem;
   border: none;
   background-color: transparent;
   overflow: hidden;
+  color: inherit;
 
   & .chatCard-content-top {
     overflow: hidden;
     text-transform: capitalize;
+    color: inherit;
   }
   & .chatCard-content-main {
     font-size: 0.8rem;
-    color: #999;
+    color: #aaa;
   }
 }
 
@@ -52,7 +56,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  height: 35px;
   align-items: end;
 
   & .chatCard-detail-time {
@@ -61,7 +65,15 @@
   }
 
   & .chatCard-detail-seen {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    width: 16px;
+    height:16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
   }
 }
 

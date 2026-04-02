@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../Context/AuthContext';
 import { decryptMessage } from '../../Hooks/useEncryptMessage';
+import { FaCheck } from "react-icons/fa6";
 
 function ChatCard({ data }) {
     const { me } = useAuth();
@@ -24,8 +25,9 @@ function ChatCard({ data }) {
         navigate(`/${receiver._id}`)
 
     }
+    const date = new Date(data.updatedAt)
+    const time = `${date.getHours()}:${date.getMinutes().toString().length < 2 ? "0" + date.getMinutes().toString() : date.getMinutes().toString()}`
 
-    
 
     return (
         <div className="chatCard">
@@ -36,10 +38,10 @@ function ChatCard({ data }) {
                 <h4 className='chatCard-content-top'>{receiver?.name}</h4>
                 {content && <p className="chatCard-content-main">{content}</p>}
             </button>
-            {/* <div className="chatCard-detail">
-                <p className="chatCard-detail-time">10:23</p>
-                <p className="chatCard-detail-seen"><FaCheck color='#ccc' /></p>
-            </div> */}
+            <div className="chatCard-detail">
+                <p className="chatCard-detail-time">{time}</p>
+                {data?.lastMessage?.sender != me._id && data.unreads > 0 && <p className="chatCard-detail-seen">{data.unreads}</p>}
+            </div>
 
         </div>
     )

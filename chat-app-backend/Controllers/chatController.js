@@ -1,6 +1,4 @@
-const { getIO } = require("../Config/socket");
 const Chat = require("../Models/Chat");
-const PrivateMessage = require("../Models/PrivateMessage");
 const User = require("../Models/User");
 const asyncErrorHandler = require("../Utils/asyncErrorHandler");
 
@@ -24,16 +22,6 @@ exports.getOrCreateChat = asyncErrorHandler(async (req, res) => {
       members: [senderId, receiverId],
       lastMessage: null, // no messages yet
     });
-
-    if (!req.user.previousChats.includes(chat._id)) {
-      req.user?.previousChats?.unshift(chat._id);
-      await req.user.save();
-    }
-
-    if (!receiver.previousChats.includes(chat._id)) {
-      receiver?.previousChats?.unshift(chat._id);
-      await receiver.save();
-    }
   }
 
   res.status(200).json({
@@ -47,8 +35,10 @@ exports.getPreviousChats = asyncErrorHandler(async (req, res, next) => {
 
   const chats = await Chat.find({
     _id: { $in: sender?.previousChats },
-  }).populate("members", "name email photo publicKey");
-  // .populate("lastMessage.sender", "name email photo publicKey");
+  })
+    .populate("members", "name email photo publicKey")
+    // .populate("lastMessage.sender", "name email photo publicKey")
+    .sort({ updatedAt: -1 });
 
   if (!chats) {
     return next(new CustomError("No prev chats!", 404));

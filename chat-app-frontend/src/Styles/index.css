@@ -1,4 +1,4 @@
-body {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -28,11 +28,10 @@ p {
   margin: 0;
 }
 
-a{
+a {
   text-decoration: none;
 }
-ul{
+ul {
   list-style: none;
   padding: 0;
 }
-

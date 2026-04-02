@@ -70,7 +70,6 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
   const page = req?.query?.page || 1;
   const limit = req?.query?.limit || 20;
 
-
   const query = {
     chatId: chatId,
   };
@@ -78,12 +77,19 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
   // seen logic
   await PrivateMessage.updateMany(
     {
+      chatId,
       sender: receiver._id,
       receiver: sender,
       seen: false,
     },
     { $set: { seen: true } },
   );
+
+  // last message update
+  if (!(chat.lastMessage.sender.toString() === sender)) {
+    chat.unreads = 0;
+    await chat.save();
+  }
 
   const data = await PrivateMessage.find(query)
     .sort({ createdAt: -1 })
@@ -92,9 +98,10 @@ exports.getPrivateMessage = asyncErrorHandler(async (req, res, next) => {
 
   const length = await PrivateMessage.countDocuments(query);
 
-  // getIO().to(chatId).emit("messagesSeen", {
-  //   by: sender,
-  // });
+  getIO().to(chatId).emit("updateSeen", {
+    by: sender,
+  });
+  // getIO().to([receiver._id.toString(), sender]).emit("updateChat", updatedChat);
 
   res.status(200).json({
     status: "success",

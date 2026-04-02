@@ -1,4 +1,3 @@
-import { FaArrowRight } from "react-icons/fa"
 import ChatCard from "../cards/ChatCard"
 import ButtonFirstMessage from "./ButtonFirstMessage"
 import { useNavigate } from "react-router-dom";
@@ -25,9 +24,10 @@ function UsersList({ data, isLoading, chatCard, activeId }) {
                 receiver = curr?.members?.find(curr => curr._id !== me._id)
 
                 return (
-                    <div key={curr._id} className={receiver && activeId === receiver?._id ? "users-card-active" : 'users-card'}  >
+                    <div key={curr._id} className={receiver && activeId === receiver?._id ? "users-card-active users-card" : 'users-card'}  >
 
                         {!chatCard && <>
+                            {/* <hr /> */}
                             <div className="chatCard">
                                 <button className="chatCard-image" onClick={() => imageClickedHandler(curr._id)}>
                                     <img src={curr?.photo} alt={curr?.name} className="chat-photo" />
@@ -38,7 +38,7 @@ function UsersList({ data, isLoading, chatCard, activeId }) {
                                 </button>
                                 <div className="userCard-end">
                                     <ButtonFirstMessage id={curr._id} user={curr}>
-                                        <FaArrowRight color="#fff" />
+                                        Message
                                     </ButtonFirstMessage>
                                 </div>
 
